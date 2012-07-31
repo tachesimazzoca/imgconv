@@ -16,7 +16,6 @@ class ResizePlugin extends Plugin {
 
     var width:Int = 0 
     var height:Int = 0 
-    var aspectFit:Boolean = true
     var fit:Boolean = true
     var geometry:Boolean = true
 
