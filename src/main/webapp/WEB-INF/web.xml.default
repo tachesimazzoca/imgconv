@@ -1,0 +1,10 @@
+<web-app>
+  <servlet>
+    <servlet-name>Imgconv</servlet-name>
+    <servlet-class>com.mazzoca.imgconv.servlet.ImgconvServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Imgconv</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+</web-app>
