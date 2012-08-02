@@ -20,6 +20,8 @@ class StripPlugin extends Plugin {
 
         try {
 
+            ImageIO.setUseCache(false)
+
             var iis:ImageInputStream = ImageIO.createImageInputStream(input)
             Option(ImageIO.getImageReaders(iis)).map { readers =>
                 if (readers.hasNext()) {

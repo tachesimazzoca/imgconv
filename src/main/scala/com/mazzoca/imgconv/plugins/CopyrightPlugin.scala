@@ -23,6 +23,8 @@ class CopyrightPlugin extends Plugin {
 
         try {
 
+            ImageIO.setUseCache(false)
+
             val iis:ImageInputStream = ImageIO.createImageInputStream(input)
             Option(ImageIO.getImageReaders(iis)).map { readers =>
                 if (readers.hasNext()) {

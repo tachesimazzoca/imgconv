@@ -21,6 +21,9 @@ class ReformatPlugin extends Plugin {
         var ios:ImageOutputStream = null
 
         try {
+
+            ImageIO.setUseCache(false)
+
             val iis:ImageInputStream = ImageIO.createImageInputStream(input)
             Option(ImageIO.getImageReaders(iis)).map { readers =>
                 if (readers.hasNext()) {

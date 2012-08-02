@@ -31,6 +31,8 @@ class DumpPlugin extends Plugin {
 
         try {
 
+            ImageIO.setUseCache(false)
+
             val iis:ImageInputStream = ImageIO.createImageInputStream(new ByteArrayInputStream(baos.toByteArray()))
             Option(ImageIO.getImageReaders(iis)).map { readers =>
                 if (readers.hasNext()) {
