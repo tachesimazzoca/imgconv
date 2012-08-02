@@ -48,7 +48,7 @@ class CopyrightPlugin extends Plugin {
             for (i <- 0 until ni) {
                 val img:IIOImage = ir.readAll(i, null)
                 var metadata:IIOMetadata = ir.getImageMetadata(i)
-                val fn:String = metadata.getNativeMetadataFormatName();
+                val fn:String = metadata.getNativeMetadataFormatName()
                 var rnode:IIOMetadataNode = metadata.getAsTree(fn).asInstanceOf[IIOMetadataNode]
                 if (i == 0) {
                     if (metadata.isReadOnly()) {
@@ -89,30 +89,28 @@ class CopyrightPlugin extends Plugin {
 
         // /markerSequence/com@comment="..."
 
-        val MARKER_SEQUENCE = "markerSequence"
-        val COM             = "com"
-        val COMMENT         = "comment"
+        val JPEG_N_MARKER_SEQUENCE = "markerSequence"
+        val JPEG_N_COM = "com"
+        val JPEG_K_COMMENT = "comment"
 
-        var nl:NodeList = rootNode.getElementsByTagName(MARKER_SEQUENCE)
+        var nl:NodeList = rootNode.getElementsByTagName(JPEG_N_MARKER_SEQUENCE)
 
         if (nl.getLength() == 0) {
-            var child0 = new IIOMetadataNode(MARKER_SEQUENCE)
-            var child1 = new IIOMetadataNode(COM)
-            child1.setAttribute(COMMENT, comment)
-            child0.appendChild(child1)
-            rootNode.appendChild(child0)
+            rootNode.appendChild(
+                new IIOMetadataNode(JPEG_N_MARKER_SEQUENCE) {
+                    this.appendChild(new IIOMetadataNode(JPEG_N_COM) { this.setAttribute(JPEG_K_COMMENT, comment) })
+                }
+            )
         } else {
             var markerSequence:IIOMetadataNode = nl.item(0).asInstanceOf[IIOMetadataNode]
-            nl = markerSequence.getElementsByTagName(COM)
+            nl = markerSequence.getElementsByTagName(JPEG_N_COM)
             if (nl.getLength() == 0) {
-                var child0 = new IIOMetadataNode(COM)
-                child0.setAttribute(COMMENT, comment)
-                markerSequence.appendChild(child0)
+                markerSequence.appendChild(new IIOMetadataNode(JPEG_N_COM) { this.setAttribute(JPEG_K_COMMENT, comment) })
             } else {
-                var child0:IIOMetadataNode = nl.item(0).asInstanceOf[IIOMetadataNode]
-                var child1 = new IIOMetadataNode(COM)
-                child1.setAttribute(COMMENT, comment)
-                markerSequence.replaceChild(child1, child0)
+                markerSequence.replaceChild(
+                    new IIOMetadataNode(JPEG_N_COM) { this.setAttribute(JPEG_K_COMMENT, comment) },
+                    nl.item(0).asInstanceOf[IIOMetadataNode]
+                )
             }
         }
     }
@@ -121,28 +119,25 @@ class CopyrightPlugin extends Plugin {
 
         // /CommentExtensions/CommentExtension@value="..."
 
-        val COM_EXTS = "CommentExtensions"
-        val COM_EXT  = "CommentExtension"
-        val VALUE    = "value"
+        val GIF_N_COMMENT_EXTS = "CommentExtensions"
+        val GIF_N_COMMENT_EXT  = "CommentExtension"
+        val GIF_K_VALUE = "value"
 
-        var nl:NodeList = rootNode.getElementsByTagName(COM_EXTS)
+        var nl:NodeList = rootNode.getElementsByTagName(GIF_N_COMMENT_EXTS)
 
         if (nl.getLength() == 0) {
-            var child0 = new IIOMetadataNode(COM_EXTS)
-            var child1 = new IIOMetadataNode(COM_EXT)
-            child1.setAttribute(VALUE, comment)
-            child0.appendChild(child1)
-            rootNode.appendChild(child0)
+            rootNode.appendChild(
+                new IIOMetadataNode(GIF_N_COMMENT_EXTS) {
+                    this.appendChild(new IIOMetadataNode(GIF_N_COMMENT_EXT) { this.setAttribute(GIF_K_VALUE, comment) })
+                }
+            )
         } else {
-            var ext:IIOMetadataNode  = nl.item(0).asInstanceOf[IIOMetadataNode]
-            nl = ext.getElementsByTagName(COM_EXT)
+            var exts:IIOMetadataNode = nl.item(0).asInstanceOf[IIOMetadataNode]
+            nl = exts.getElementsByTagName(GIF_N_COMMENT_EXT)
             if (nl.getLength() == 0) {
-                var child0 = new IIOMetadataNode(COM_EXT);
-                child0.setAttribute(VALUE, comment);
-                ext.appendChild(child0)
+                exts.appendChild(new IIOMetadataNode(GIF_N_COMMENT_EXT) { this.setAttribute(GIF_K_VALUE, comment) } )
             } else {
-                var child0:IIOMetadataNode = nl.item(0).asInstanceOf[IIOMetadataNode];
-                child0.setAttribute(VALUE, comment);
+                nl.item(0).asInstanceOf[IIOMetadataNode].setAttribute(GIF_K_VALUE, comment)
             }
         }
     }
@@ -152,41 +147,46 @@ class CopyrightPlugin extends Plugin {
         // /tExt/tExtEntry@keyword="Copyright"
         // /tExt/tExtEntry@value="...."
 
-        val T_EXT       = "tEXt"
-        val T_EXT_ENTRY = "tEXtEntry"
-        val KEYWORD     = "keyword"
-        val COPYRIGHT   = "Copyright"
-        val VALUE       = "value"
+        val PNG_N_T_EXT = "tEXt"
+        val PNG_N_T_EXT_ENTRY = "tEXtEntry"
+        val PNG_K_KEYWORD = "keyword"
+        val PNG_V_KEYWORD = "Copyright"
+        val PNG_K_VALUE = "value"
 
-        var nl:NodeList = rootNode.getElementsByTagName("tExt")
+        var nl:NodeList = rootNode.getElementsByTagName(PNG_N_T_EXT)
 
         if (nl.getLength() == 0) {
-            var child0 = new IIOMetadataNode(T_EXT)
-            var child1 = new IIOMetadataNode(T_EXT_ENTRY)
-            child1.setAttribute(KEYWORD, COPYRIGHT)
-            child1.setAttribute(VALUE, comment)
-            child0.appendChild(child1)
-            rootNode.appendChild(child0)
+            rootNode.appendChild(
+                new IIOMetadataNode(PNG_N_T_EXT) {
+                    this.appendChild(
+                        new IIOMetadataNode(PNG_N_T_EXT_ENTRY) {
+                            this.setAttribute(PNG_K_KEYWORD, PNG_V_KEYWORD)
+                            this.setAttribute(PNG_K_VALUE, comment)
+                        }
+                    )
+                }
+            )
         } else {
             var ext:IIOMetadataNode = nl.item(0).asInstanceOf[IIOMetadataNode]
-            nl = ext.getElementsByTagName(T_EXT_ENTRY)
+            nl = ext.getElementsByTagName(PNG_N_T_EXT_ENTRY)
             val n:Int = nl.getLength()
-            var done:Boolean = false
+            var done = false
             if (n > 0) {
                 for (i <- 0 until n if !done) {
-                    var child0 = nl.item(i).asInstanceOf[IIOMetadataNode]
-                    var v = child0.getAttribute(KEYWORD)
-                    if (Option(v).exists(str => str == COPYRIGHT)) {
-                        child0.setAttribute(VALUE, comment)
+                    val child0 = nl.item(i).asInstanceOf[IIOMetadataNode]
+                    if (Option(child0.getAttribute(PNG_K_KEYWORD)).exists(str => str == PNG_V_KEYWORD)) {
+                        child0.setAttribute(PNG_K_VALUE, comment)
                         done = true
                     }
                 }
             }
             if (!done) {
-                var child0 = new IIOMetadataNode(T_EXT_ENTRY)
-                child0.setAttribute(KEYWORD, COPYRIGHT)
-                child0.setAttribute(VALUE, comment)
-                ext.appendChild(child0)
+                ext.appendChild(
+                    new IIOMetadataNode(PNG_N_T_EXT_ENTRY) {
+                        this.setAttribute(PNG_K_KEYWORD, PNG_V_KEYWORD)
+                        this.setAttribute(PNG_K_VALUE, comment)
+                    }
+                )
             }
         }
     }
