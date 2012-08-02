@@ -2,8 +2,9 @@ package com.mazzoca.imgconv.plugins
 
 import java.io.{InputStream, OutputStream, IOException}
 
-import java.awt.{Graphics2D, RenderingHints}
-import java.awt.image.{BufferedImage}
+import java.awt.{Color, Graphics2D, RenderingHints}
+import java.awt.image.{BufferedImage, IndexColorModel}
+import java.awt.geom.{AffineTransform}
 
 import javax.imageio.{ImageIO, IIOImage, ImageReader, ImageWriter}
 import javax.imageio.stream.{ImageInputStream, ImageOutputStream}
@@ -89,14 +90,39 @@ class ResizePlugin extends Plugin {
                     }
                 }
 
-                val rbimg:BufferedImage = new BufferedImage(w, h, bimg.getType())
-                val g2d:Graphics2D = rbimg.createGraphics()
-                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                     RenderingHints.VALUE_INTERPOLATION_BILINEAR)
-                g2d.drawImage(bimg, 0, 0, w, h, null)
-                g2d.dispose()
+                if (w != bimg.getWidth() || h != bimg.getWidth()) {
 
-                imgs += new IIOImage(rbimg, null, null) 
+                    var rbimg:BufferedImage = null 
+
+                    bimg.getColorModel() match {
+                        case cmodel:IndexColorModel => {
+                            rbimg = new BufferedImage(w, h, bimg.getType(), bimg.getColorModel().asInstanceOf[IndexColorModel])
+                        }
+                        case _ => {
+                            rbimg = new BufferedImage(w, h, bimg.getType())
+                        }
+                    }
+     
+                    if (rbimg.getColorModel().hasAlpha() && rbimg.getColorModel().isInstanceOf[IndexColorModel]) {
+                        val transparentPixel:Int = rbimg.getColorModel().asInstanceOf[IndexColorModel].getTransparentPixel()
+                        for (x <- 0 until w) {
+                            for (y <- 0 until h) {
+                                rbimg.setRGB(x, y, transparentPixel)
+                            }
+                        }
+                    }
+
+                    val g2d:Graphics2D = rbimg.createGraphics()
+                    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                         RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+                    g2d.drawImage(bimg, 0, 0, w, h, null)
+                    g2d.dispose()
+
+                    imgs += new IIOImage(rbimg, null, null) 
+
+                } else {
+                    imgs += new IIOImage(bimg, null, null)
+                }
             }
 
             if (imgs.size() == 1) {
