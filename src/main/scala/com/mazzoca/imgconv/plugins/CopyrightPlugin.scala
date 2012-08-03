@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
 
 class CopyrightPlugin extends Plugin {
 
-    var comment = """copy="NO",kdd_copyright=on"""
+    var comment = """kddi_copyright=on,copy="NO""""
 
     def execute(input:InputStream, output:OutputStream) = {
 
