@@ -85,7 +85,10 @@ class URLFetcher {
                 }
             }
         } catch {
-            case e:Exception => { this._message = e.getMessage() }
+            case e:Exception => {
+                source = null
+                this._message = e.getMessage()
+            }
         } finally {
             httpGet.abort()
         }
