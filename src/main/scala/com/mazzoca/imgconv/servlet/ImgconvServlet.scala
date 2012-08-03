@@ -29,9 +29,15 @@ class ImgconvServlet extends HttpServlet {
     override def doGet(request:HttpServletRequest, response:HttpServletResponse): Unit = {
 
         val ptn = """^/([^/]+)(/.+)\.(jpz|jpg|png|pnz|gif)$""".r
-        val (validURL, noTransfer, backendName, filename, suffix) = ptn.findFirstIn(request.getPathInfo()) match {
+        val (validURL:Boolean, noTransfer:Boolean, backendName:String, filename:String, suffix:String) = ptn.findFirstIn(request.getPathInfo()) match {
             case Some(ptn(m1, m2, m3)) => {
-                (true, m3.endsWith("z"), m1, m2, (if (m3.endsWith("z")) m3.init + "g" else m3)) 
+                (
+                    true,
+                    m3.endsWith("z") || Option(request.getParameter("copyright")).getOrElse("no") == "yes",
+                    m1,
+                    m2,
+                    (if (m3.endsWith("z")) m3.init + "g" else m3)
+                ) 
             }
             case None => (false, false, null, null, null)
         }
@@ -90,7 +96,7 @@ class ImgconvServlet extends HttpServlet {
 
         val cvopt = new ConvertOption() 
         cvopt.formatName = suffix
-        cvopt.copyright = noTransfer || Option(request.getParameter("copyright")).getOrElse("no") == "yes"
+        cvopt.copyright = noTransfer
         request.getParameterNames().foreach { key =>
             val values:Array[String] = request.getParameterValues(key.asInstanceOf[String]).asInstanceOf[Array[String]]
             if (values.size > 0) {
@@ -128,6 +134,11 @@ class ImgconvServlet extends HttpServlet {
         }
 
         response.setHeader("Content-Length", bytes.size.toString())
+
+        if (noTransfer) {
+            response.addHeader("x-jphone-copyright", "no-transfer")
+            response.addHeader("x-jphone-copyright", "no-peripheral")
+        }
 
         val BUFFER_SIZE = 4096
         var is:ByteArrayInputStream = null
