@@ -2,6 +2,10 @@
   <servlet>
     <servlet-name>Imgconv</servlet-name>
     <servlet-class>com.mazzoca.imgconv.servlet.ImgconvServlet</servlet-class>
+    <init-param>
+      <param-name>conf.backend</param-name>
+      <param-value>conf/backend</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>Imgconv</servlet-name>

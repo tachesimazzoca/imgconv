@@ -1,7 +1,7 @@
 package com.mazzoca.imgconv.servlet
 
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
-import javax.servlet.{ServletOutputStream}
+import javax.servlet.{ServletConfig, ServletOutputStream}
 
 import java.io.{File, FileInputStream, ByteArrayInputStream, ByteArrayOutputStream}
 import java.util.{Date, Properties}
@@ -15,10 +15,21 @@ import scala.collection.mutable.HashMap
 
 class ImgconvServlet extends HttpServlet {
 
+    val params = new HashMap[String, String]
+    val backends = new HashMap[String, Properties]
+
+    override def init(): Unit = {
+        Option(super.getServletConfig()).map { cfg:ServletConfig =>
+            cfg.getInitParameterNames().foreach { nm =>
+                this.params(nm.asInstanceOf[String]) = cfg.getInitParameter(nm.asInstanceOf[String])
+            }
+        }
+    }
+
     override def doGet(request:HttpServletRequest, response:HttpServletResponse): Unit = {
 
         val ptn = """^/([^/]+)(/.+)\.(jpz|jpg|png|pnz|gif)$""".r
-        val (validURL, noTransfer, backend, filename, suffix) = ptn.findFirstIn(request.getPathInfo()) match {
+        val (validURL, noTransfer, backendName, filename, suffix) = ptn.findFirstIn(request.getPathInfo()) match {
             case Some(ptn(m1, m2, m3)) => {
                 (true, m3.endsWith("z"), m1, m2, (if (m3.endsWith("z")) m3.init + "g" else m3)) 
             }
@@ -31,14 +42,24 @@ class ImgconvServlet extends HttpServlet {
 
         // Load a backend configuration. 
 
-        val prop = new Properties()
-
-        try {
-            prop.load(this.getClass().getResourceAsStream("/backend/" + backend + ".properties"))
-        } catch {
-            case e:Exception => {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN)
-                return
+        var prop:Properties = this.backends.get(backendName) match {
+            case Some(pr) => pr
+            case None => {
+                val pr = new Properties()
+                var fis:FileInputStream = null
+                try {
+                    fis = new FileInputStream(this.params.getOrElse("conf.backend", "conf/backend") + "/" + backendName + ".properties")
+                    pr.load(fis)
+                } catch {
+                    case e:Exception => {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                        return
+                    }
+                } finally {
+                    if (fis != null) fis.close()
+                }
+                this.backends(backendName) = pr
+                pr
             }
         }
 
