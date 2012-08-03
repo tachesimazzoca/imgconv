@@ -92,23 +92,19 @@ class ResizePlugin extends Plugin {
 
                 if (w != bimg.getWidth() || h != bimg.getWidth()) {
 
-                    var rbimg:BufferedImage = null 
-
-                    bimg.getColorModel() match {
-                        case cmodel:IndexColorModel => {
-                            rbimg = new BufferedImage(w, h, bimg.getType(), bimg.getColorModel().asInstanceOf[IndexColorModel])
+                    var rbimg:BufferedImage = bimg.getColorModel() match {
+                        case icm:IndexColorModel => {
+                            new BufferedImage(w, h, bimg.getType(), bimg.getColorModel().asInstanceOf[IndexColorModel])
                         }
                         case _ => {
-                            rbimg = new BufferedImage(w, h, bimg.getType())
+                            new BufferedImage(w, h, bimg.getType())
                         }
                     }
      
                     if (rbimg.getColorModel().hasAlpha() && rbimg.getColorModel().isInstanceOf[IndexColorModel]) {
-                        val transparentPixel:Int = rbimg.getColorModel().asInstanceOf[IndexColorModel].getTransparentPixel()
-                        for (x <- 0 until w) {
-                            for (y <- 0 until h) {
-                                rbimg.setRGB(x, y, transparentPixel)
-                            }
+                        val tp:Int = rbimg.getColorModel().asInstanceOf[IndexColorModel].getTransparentPixel()
+                        for (x <- 0 until w; y <- 0 until h) {
+                            rbimg.setRGB(x, y, tp)
                         }
                     }
 
