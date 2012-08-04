@@ -29,7 +29,8 @@ class ImgconvServlet extends HttpServlet {
     override def doGet(request:HttpServletRequest, response:HttpServletResponse): Unit = {
 
         val ptn = """^/([^/]+)(/.+)\.(jpz|jpg|png|pnz|gif)$""".r
-        val (validURL:Boolean, noTransfer:Boolean, backendName:String, filename:String, suffix:String) = ptn.findFirstIn(request.getPathInfo()) match {
+        val (validURL:Boolean, noTransfer:Boolean,
+                backendName:String, filename:String, suffix:String) = ptn.findFirstIn(request.getPathInfo()) match {
             case Some(ptn(m1, m2, m3)) => {
                 (
                     true,
@@ -54,7 +55,9 @@ class ImgconvServlet extends HttpServlet {
                 val pr = new Properties()
                 var fis:FileInputStream = null
                 try {
-                    fis = new FileInputStream(this.params.getOrElse("conf.backend", "conf/backend") + "/" + backendName + ".properties")
+                    fis = new FileInputStream(
+                        this.params.getOrElse("conf.backend", "conf/backend") + "/" + backendName + ".properties"
+                    )
                     pr.load(fis)
                 } catch {
                     case e:Exception => {
