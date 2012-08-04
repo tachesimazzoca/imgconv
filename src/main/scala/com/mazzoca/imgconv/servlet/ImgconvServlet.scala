@@ -152,7 +152,11 @@ class ImgconvServlet extends HttpServlet {
                 os.write(buf, 0, n)
             }
         } catch {
-            case e:Exception => { e.printStackTrace() }
+            case e:Exception => {
+                e.printStackTrace()
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+                return
+            }
         } finally {
             if (is != null) is.close()
             if (os != null) os.close()
