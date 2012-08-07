@@ -6,6 +6,7 @@ import javax.servlet.{ServletConfig, ServletOutputStream}
 import java.io.{File, FileInputStream, ByteArrayInputStream, ByteArrayOutputStream}
 import java.util.{Date, Properties}
 
+import com.mazzoca.imgconv.Device
 import com.mazzoca.imgconv.URLFetcher
 import com.mazzoca.imgconv.ConvertOption
 import com.mazzoca.imgconv.plugins.factory.DefaultPluginBrokerFactory
@@ -95,8 +96,10 @@ class ImgconvServlet extends HttpServlet {
             return
         }
 
-        // Create a convert option.
+        // Create a device object with request.
+        val device:Device = Device(request)
 
+        // Create a convert option.
         val cvopt = new ConvertOption() 
         cvopt.formatName = suffix
         cvopt.copyright = noTransfer
@@ -106,16 +109,7 @@ class ImgconvServlet extends HttpServlet {
                 cvopt.params(key.asInstanceOf[String]) = values(0)
             }
         }
-        Option(request.getHeader("x-jphone-display")).map { str =>
-            val regexp = """^([0-9]{1,4})\*([0-9]{1,4})$""".r
-            regexp.findFirstIn(str) match {
-                case Some(regexp(m1, m2)) => {
-                    cvopt.displayWidth = m1.toInt
-                    cvopt.displayHeight = m2.toInt
-                }
-                case None =>
-            }
-        }
+        cvopt.device = device 
 
         // Convert a image.
 
@@ -150,7 +144,7 @@ class ImgconvServlet extends HttpServlet {
 
         response.setHeader("Content-Length", bytes.size.toString())
 
-        if (noTransfer) {
+        if (noTransfer && device.isSoftbank()) {
             response.addHeader("x-jphone-copyright", "no-transfer")
             response.addHeader("x-jphone-copyright", "no-peripheral")
         }

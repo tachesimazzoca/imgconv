@@ -11,9 +11,9 @@ import org.w3c.dom.{Node, NodeList}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConversions._
 
-class CopyrightPlugin extends Plugin {
+class CommentPlugin extends Plugin {
 
-    var comment = """kddi_copyright=on,copy="NO""""
+    var comment = ""
 
     def execute(input:InputStream, output:OutputStream) = {
 

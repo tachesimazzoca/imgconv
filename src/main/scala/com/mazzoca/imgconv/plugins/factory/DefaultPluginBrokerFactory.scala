@@ -2,6 +2,7 @@ package com.mazzoca.imgconv.plugins.factory
 
 import scala.collection.mutable.HashMap 
 
+import com.mazzoca.imgconv.Device
 import com.mazzoca.imgconv.ConvertOption
 import com.mazzoca.imgconv.plugins._
 
@@ -24,37 +25,37 @@ object DefaultPluginBrokerFactory extends PluginBrokerFactory {
                 pin.fit = false 
                 val n = d.toInt
                 if (wh == "w") {
-                    pin.width = if (p == "p") (option.displayWidth * n / 100) else n 
+                    pin.width = if (p == "p") (option.device.displayWidth * n / 100) else n 
                     pin.height = 0 
                 } else {
                     pin.width = 0 
-                    pin.height = if (p == "p") (option.displayHeight * n / 100) else n 
+                    pin.height = if (p == "p") (option.device.displayHeight * n / 100) else n 
                 }
             }
             case fitPattern(d, p, ft) => {
                 pin.geometry = true
                 pin.fit = (ft == "fit")
                 var dn = Option(d).getOrElse("0").toInt
-                if (option.displayWidth < option.displayHeight) {
+                if (option.device.displayWidth < option.device.displayHeight) {
                     if (p == null) {
-                        pin.width = if (dn == 0) option.displayWidth else dn
+                        pin.width = if (dn == 0) option.device.displayWidth else dn
                     } else {
-                        pin.width = (option.displayWidth * dn / 100).floor.asInstanceOf[Int]
+                        pin.width = (option.device.displayWidth * dn / 100).floor.asInstanceOf[Int]
                     }
                     pin.height = 0 
                 } else {
                     pin.width = 0 
                     if (p == null) {
-                        pin.height = if (dn == 0) option.displayHeight else dn
+                        pin.height = if (dn == 0) option.device.displayHeight else dn
                     } else {
-                        pin.height = (option.displayHeight * dn / 100).floor.asInstanceOf[Int]
+                        pin.height = (option.device.displayHeight * dn / 100).floor.asInstanceOf[Int]
                     }
                 }
             }
             case _ => {
                 pin.geometry = true
                 pin.fit = false 
-                pin.width = option.displayWidth
+                pin.width = option.device.displayWidth
                 pin.height = 0 
             }
         }
@@ -63,7 +64,13 @@ object DefaultPluginBrokerFactory extends PluginBrokerFactory {
         broker.plugins += new StripPlugin() 
 
         if (option.copyright) {
-            broker.plugins += new CopyrightPlugin() 
+            broker.plugins += new CommentPlugin() {
+                this.comment = option.device.getCarrierId() match {
+                    case Device.CARRIER_ID_DOCOMO => "copy=\"NO\""
+                    case Device.CARRIER_ID_AU => "kddi_copyright=on"
+                    case _ => "kddi_copyright=on,copy=\"NO\""
+                }
+            }
         }
 
         broker
