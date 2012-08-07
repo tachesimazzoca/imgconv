@@ -95,7 +95,7 @@ class ImgconvServlet extends HttpServlet {
             return
         }
 
-        // Convert the image.
+        // Create a convert option.
 
         val cvopt = new ConvertOption() 
         cvopt.formatName = suffix
@@ -106,6 +106,18 @@ class ImgconvServlet extends HttpServlet {
                 cvopt.params(key.asInstanceOf[String]) = values(0)
             }
         }
+        Option(request.getHeader("x-jphone-display")).map { str =>
+            val regexp = """^([0-9]{1,4})\*([0-9]{1,4})$""".r
+            regexp.findFirstIn(str) match {
+                case Some(regexp(m1, m2)) => {
+                    cvopt.displayWidth = m1.toInt
+                    cvopt.displayHeight = m2.toInt
+                }
+                case None =>
+            }
+        }
+
+        // Convert a image.
 
         var baos:ByteArrayOutputStream = new ByteArrayOutputStream() 
 
