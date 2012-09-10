@@ -65,7 +65,7 @@ object DefaultPluginBrokerFactory extends PluginBrokerFactory {
 
         if (option.copyright) {
             broker.plugins += new CommentPlugin() {
-                this.comment = option.device.getCarrierId() match {
+                this.comment = option.device.carrierId match {
                     case Device.CARRIER_ID_DOCOMO => "copy=\"NO\""
                     case Device.CARRIER_ID_AU => "kddi_copyright=on"
                     case _ => "kddi_copyright=on,copy=\"NO\""
