@@ -101,7 +101,7 @@ class ImgconvServlet extends HttpServlet {
 
         // Create a convert option.
         val cvopt = new ConvertOption() 
-        cvopt.formatName = suffix
+        cvopt.formatName = Some(suffix)
         cvopt.copyright = noTransfer
         request.getParameterNames().foreach { key =>
             val values:Array[String] = request.getParameterValues(key.asInstanceOf[String]).asInstanceOf[Array[String]]
@@ -109,7 +109,7 @@ class ImgconvServlet extends HttpServlet {
                 cvopt.params(key.asInstanceOf[String]) = values(0)
             }
         }
-        cvopt.device = device 
+        cvopt.device = Some(device)
 
         // Convert a image.
 
@@ -135,7 +135,7 @@ class ImgconvServlet extends HttpServlet {
             return
         }
 
-        cvopt.formatName match {
+        cvopt.formatName.getOrElse("") match {
             case "jpg" => response.setContentType("image/jpeg")
             case "gif" => response.setContentType("image/gif")
             case "png" => response.setContentType("image/png")
