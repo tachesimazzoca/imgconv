@@ -5,5 +5,5 @@ import com.mazzoca.imgconv.plugins.PluginBroker
 
 trait PluginBrokerFactory {
 
-    def create(option:ConvertOption): PluginBroker
+  def create(option: ConvertOption): PluginBroker
 }
