@@ -12,20 +12,19 @@ import javax.imageio.metadata.IIOMetadata
 
 import org.w3c.dom.Node
 
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConversions._
 
 class DumpPlugin extends Plugin {
 
   var writer: Option[PrintWriter] = None 
 
-  def execute(input: InputStream, output: OutputStream) = {
+  def execute(input: InputStream, output: OutputStream) {
 
     var baos = new ByteArrayOutputStream()
 
-    var buf: Array[Byte] = new Array[Byte](4096) 
+    var buf = new Array[Byte](4096) 
     try {
-      var n: Int = 0
+      var n = 0
       while ({n = input.read(buf, 0, 4096); n > 0}) {
         output.write(buf, 0, n)
         baos.write(buf, 0, n)
@@ -56,7 +55,7 @@ class DumpPlugin extends Plugin {
       for (i <- 0 until ni) {
         val meta: IIOMetadata = ir.getImageMetadata(i)
         Option(meta.getMetadataFormatNames()) map { formatNames =>
-          formatNames.foreach { formatName =>
+          formatNames foreach { formatName =>
             this.displayNode(meta.getAsTree(formatName), 0)
           }
         }
@@ -70,7 +69,7 @@ class DumpPlugin extends Plugin {
     }
   } 
 
-  private def displayNode(node: Node, depth: Int): Unit = {
+  private def displayNode(node: Node, depth: Int) {
 
     val indent = " " * depth
 

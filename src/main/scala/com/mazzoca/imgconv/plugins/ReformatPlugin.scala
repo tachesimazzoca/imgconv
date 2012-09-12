@@ -8,14 +8,13 @@ import javax.imageio.{IIOImage, ImageIO, ImageReader, ImageWriter, ImageTypeSpec
 import javax.imageio.stream.{ImageInputStream, ImageOutputStream}
 import javax.imageio.metadata.IIOMetadata
 
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConversions._
 
 class ReformatPlugin extends Plugin {
 
   var formatName = "" 
 
-  def execute(input: InputStream, output: OutputStream) = {
+  def execute(input: InputStream, output: OutputStream) {
 
     var ir: ImageReader = null
     var iw: ImageWriter = null

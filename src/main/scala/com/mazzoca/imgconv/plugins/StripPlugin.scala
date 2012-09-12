@@ -12,7 +12,7 @@ import scala.collection.JavaConversions._
 
 class StripPlugin extends Plugin {
 
-  def execute(input: InputStream, output: OutputStream) = {
+  def execute(input: InputStream, output: OutputStream) {
 
     var ir: ImageReader = null
     var iw: ImageWriter = null

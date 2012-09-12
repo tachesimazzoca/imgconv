@@ -7,6 +7,7 @@ import com.mazzoca.imgconv.plugins._
 class PluginBrokerSpec extends FunSpec {
 
   describe("PluginBroker") {
+
     it ("execute empty input.") {
       val broker = new PluginBroker()
       for (i <- 0 until 2) {
@@ -17,6 +18,7 @@ class PluginBrokerSpec extends FunSpec {
         assert(bytes.length == 0)
       }
     }
+
     it ("execute empty plugins.") {
       val broker = new PluginBroker()
       for (i <- 0 until 2) {

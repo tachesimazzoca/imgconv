@@ -15,7 +15,7 @@ class CommentPlugin extends Plugin {
 
   var comment = ""
 
-  def execute(input: InputStream, output: OutputStream) = {
+  def execute(input: InputStream, output: OutputStream) {
 
     var ir: ImageReader = null
     var iw: ImageWriter = null
@@ -26,7 +26,7 @@ class CommentPlugin extends Plugin {
       ImageIO.setUseCache(false)
 
       val iis: ImageInputStream = ImageIO.createImageInputStream(input)
-      Option(ImageIO.getImageReaders(iis)).map { readers =>
+      Option(ImageIO.getImageReaders(iis)) map { readers =>
         if (readers.hasNext()) {
           ir = readers.next()
           ir.setInput(iis)
@@ -43,7 +43,7 @@ class CommentPlugin extends Plugin {
       ios = ImageIO.createImageOutputStream(output)
       iw.setOutput(ios)
 
-      var imgs: ArrayBuffer[IIOImage] = ArrayBuffer() 
+      var imgs: ArrayBuffer[IIOImage] = ArrayBuffer[IIOImage]() 
 
       var ni: Int = ir.getNumImages(true)
       for (i <- 0 until ni) {
@@ -72,9 +72,7 @@ class CommentPlugin extends Plugin {
         iw.write(imgs(0))
       } else {
         iw.prepareWriteSequence(ir.getStreamMetadata())
-        imgs.foreach { img =>
-          iw.writeToSequence(img, null)
-        }
+        imgs foreach { iw.writeToSequence(_, null) }
         iw.endWriteSequence()
       }
 
@@ -87,7 +85,7 @@ class CommentPlugin extends Plugin {
     }
   } 
 
-  private def addCommentForJPEG(rootNode: IIOMetadataNode, comment: String): Unit = {
+  private def addCommentForJPEG(rootNode: IIOMetadataNode, comment: String) {
 
     // /markerSequence/com@comment="..."
 
@@ -119,7 +117,7 @@ class CommentPlugin extends Plugin {
     }
   }
 
-  private def addCommentForGIF(rootNode: IIOMetadataNode, comment: String): Unit = {
+  private def addCommentForGIF(rootNode: IIOMetadataNode, comment: String) {
 
     // /CommentExtensions/CommentExtension@value="..."
 
@@ -149,7 +147,7 @@ class CommentPlugin extends Plugin {
     }
   }
 
-  private def addCommentForPNG(rootNode: IIOMetadataNode, comment: String): Unit = {
+  private def addCommentForPNG(rootNode: IIOMetadataNode, comment: String) {
 
     // /tExt/tExtEntry@keyword="Copyright"
     // /tExt/tExtEntry@value="...."

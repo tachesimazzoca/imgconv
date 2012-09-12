@@ -11,12 +11,12 @@ class Device {
   var displayWidth: Int = 240
   var displayHeight: Int = 320
 
-  def this(userAgent: String) = {
+  def this(userAgent: String) {
     this
     this.loadUserAgent(userAgent)
   }
 
-  def this(request: HttpServletRequest) = {
+  def this(request: HttpServletRequest) {
     this
     this.loadUserAgent(Option(request.getHeader("User-Agent")).getOrElse(""))
     if (this.isSoftbank) {
@@ -41,7 +41,7 @@ class Device {
   def isSoftbank(): Boolean = { this.carrierId == Device.CARRIER_ID_SOFTBANK }
   def isWillcom(): Boolean = { this.carrierId == Device.CARRIER_ID_WILLCOM }
 
-  def loadUserAgent(userAgent: String): Unit = {
+  def loadUserAgent(userAgent: String) {
 
     this._userAgent = userAgent
 

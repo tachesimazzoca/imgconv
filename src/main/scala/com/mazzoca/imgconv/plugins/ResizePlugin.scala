@@ -19,7 +19,7 @@ class ResizePlugin extends Plugin {
   var fit = true
   var geometry = true
 
-  def execute(input: InputStream, output: OutputStream) = {
+  def execute(input: InputStream, output: OutputStream) {
 
     var ir: ImageReader = null
     var iw: ImageWriter = null
@@ -30,7 +30,7 @@ class ResizePlugin extends Plugin {
       ImageIO.setUseCache(false)
 
       val iis: ImageInputStream = ImageIO.createImageInputStream(input)
-      Option(ImageIO.getImageReaders(iis)).map { readers =>
+      Option(ImageIO.getImageReaders(iis)) map { readers =>
         if (readers.hasNext()) {
           ir = readers.next()
           ir.setInput(iis)
@@ -47,7 +47,7 @@ class ResizePlugin extends Plugin {
       ios = ImageIO.createImageOutputStream(output)
       iw.setOutput(ios)
 
-      var imgs: ArrayBuffer[IIOImage] = ArrayBuffer() 
+      var imgs: ArrayBuffer[IIOImage] = ArrayBuffer[IIOImage]() 
 
       val ni: Int = ir.getNumImages(true)
       for (i <- 0 until ni) {

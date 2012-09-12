@@ -83,7 +83,7 @@ javax_imageio_1.0
     }
   }
 
-  def withCloseable(args: Array[Closeable])(f: (Array[Closeable]) => Unit): Unit = {
+  def withCloseable(args: Array[Closeable])(f: (Array[Closeable]) => Unit) {
     try {
       f(args)
     } finally {

@@ -8,17 +8,17 @@ import scala.collection.JavaConversions._
 class PluginBroker {
 
   var plugins: ArrayBuffer[Plugin] = ArrayBuffer[Plugin]()
-  var debug: Boolean = false
+  var debug = false
 
-  def execute(input: InputStream, output: OutputStream): Unit = {
+  def execute(input: InputStream, output: OutputStream) {
 
     var bais: ByteArrayInputStream = null
     var baos = new ByteArrayOutputStream()
-    var buf: Array[Byte] = new Array[Byte](4096) 
+    var buf = new Array[Byte](4096) 
 
     try {
 
-      var n: Int = 0
+      var n = 0
       while ({n = input.read(buf, 0, 4096); n > 0}) baos.write(buf, 0, n)
 
       bais = new ByteArrayInputStream(baos.toByteArray())
@@ -31,7 +31,7 @@ class PluginBroker {
 
     try {
 
-      this.plugins.foreach { plugin =>
+      this.plugins foreach { plugin =>
 
         if (this.debug) println("plugin: " + plugin)
         plugin.execute(bais, baos)
@@ -43,7 +43,7 @@ class PluginBroker {
       }
 
       try {
-        var n: Int = 0
+        var n = 0
         while ({n = bais.read(buf, 0, 4096); n > 0}) output.write(buf, 0, n)
       } catch {
         case (e: Exception) => { throw e }
@@ -51,6 +51,7 @@ class PluginBroker {
 
     } catch {
       case (e: Exception) => { throw e }
+
     } finally {
       Option(bais) map { _.close() }
       Option(baos) map { _.close() }
