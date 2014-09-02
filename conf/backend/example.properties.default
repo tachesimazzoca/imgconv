@@ -1,3 +1,0 @@
-baseurl=http://localhost
-datadir=imgconv/data/backend/example/sources
-maxage=60
