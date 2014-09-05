@@ -25,10 +25,10 @@ public class Geometry {
      * and {@link ScalingStrategy}.
      */
     public Geometry(int width, int height, ScalingStrategy scalingStrategy) {
-        if (width < 0)
+        if (width != NO_VALUE && width < 1)
             throw new IllegalArgumentException(
                     "The parameter width must be equal or greater than 0.");
-        if (height < 0)
+        if (height != NO_VALUE && height < 1)
             throw new IllegalArgumentException(
                     "The parameter height must be equals or greater than 0.");
         this.width = width;
@@ -40,7 +40,7 @@ public class Geometry {
         /**
          * Width and height emphatically given, original aspect ratio ignored.
          */
-        EMPHATIC(new Scaler() {
+        EMPHATIC(new Scalable() {
             public Dimension scale(int boundaryW, int boundaryH, int sourceW, int sourceH) {
                 int w = (boundaryW == NO_VALUE) ? sourceW : boundaryW;
                 int h = (boundaryH == NO_VALUE) ? (sourceH * w / sourceW) : boundaryH;
@@ -51,7 +51,7 @@ public class Geometry {
         /**
          * Maximum values of height and width given, aspect ratio preserved.
          */
-        MAXIMUM(new Scaler() {
+        MAXIMUM(new Scalable() {
             public Dimension scale(int boundaryW, int boundaryH, int sourceW, int sourceH) {
                 int gw = (boundaryW == NO_VALUE) ? sourceW : boundaryW;
                 int gh = (boundaryH == NO_VALUE) ? (sourceH * gw / sourceW) : boundaryH;
@@ -72,7 +72,7 @@ public class Geometry {
         /**
          * Minimum values of width and height given, aspect ratio preserved.
          */
-        MINIMUM(new Scaler() {
+        MINIMUM(new Scalable() {
             public Dimension scale(int boundaryW, int boundaryH, int sourceW, int sourceH) {
                 int gw = (boundaryW == NO_VALUE) ? sourceW : boundaryW;
                 int gh = (boundaryH == NO_VALUE) ? (sourceH * gw / sourceW) : boundaryH;
@@ -90,30 +90,18 @@ public class Geometry {
             }
         });
 
-        private Scaler scaler;
+        private Scalable strategy;
 
-        private ScalingStrategy(Scaler scaler) {
-            this.scaler = scaler;
+        private ScalingStrategy(Scalable strategy) {
+            this.strategy = strategy;
         }
 
         private Dimension scale(int boundaryW, int boundaryH, int sourceW, int sourceH) {
-            if (boundaryW != NO_VALUE && boundaryW < 1)
-                throw new IllegalArgumentException(
-                        "The parameter boundaryW must be greater than 0.");
-            if (boundaryH != NO_VALUE && boundaryH < 1)
-                throw new IllegalArgumentException(
-                        "The parameter boundaryH must be greater than 0.");
-            if (sourceW < 1)
-                throw new IllegalArgumentException(
-                        "The parameter sourceW must be greater than 0.");
-            if (sourceH < 1)
-                throw new IllegalArgumentException(
-                        "The parameter sourceH must be greater than 0.");
-            return scaler.scale(boundaryW, boundaryH, sourceW, sourceH);
+            return strategy.scale(boundaryW, boundaryH, sourceW, sourceH);
         }
     }
 
-    private interface Scaler {
+    private interface Scalable {
         public Dimension scale(int boundaryW, int boundaryH, int sourceW, int sourceH);
     }
 
