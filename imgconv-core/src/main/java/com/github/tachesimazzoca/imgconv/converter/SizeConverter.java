@@ -12,18 +12,16 @@ import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 
 import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.ImageOutputStream;
 
 import com.github.tachesimazzoca.imgconv.Converter;
 import com.github.tachesimazzoca.imgconv.Geometry;
 import com.github.tachesimazzoca.imgconv.ImageUtils;
+import com.github.tachesimazzoca.imgconv.Writable;
 
 public class SizeConverter implements Converter {
-    private final Geometry geometry;
+    private final Writable func;
 
     /**
      * Creates a converter with the specified {@link Geometry} object.
@@ -31,7 +29,7 @@ public class SizeConverter implements Converter {
      * @param geometry
      */
     public SizeConverter(Geometry geometry) {
-        this.geometry = geometry;
+        this.func = createFunction(geometry);
     }
 
     /**
@@ -56,75 +54,53 @@ public class SizeConverter implements Converter {
         this(new Geometry(width, height, scalingStrategy));
     }
 
+    @Override
     public void convert(InputStream input, OutputStream output) throws IOException {
-        ImageReader ir = null;
-        ImageWriter iw = null;
-        ImageOutputStream ios = null;
+        ImageUtils.withImageWriter(input, output, func);
+    }
 
-        try {
-            // prepare Image(Reader|Writer)
-            ImageIO.setUseCache(false);
-            ImageInputStream iis = ImageIO.createImageInputStream(input);
-            java.util.Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
-            if (readers != null && readers.hasNext()) {
-                ir = readers.next();
-                ir.setInput(iis);
-            }
-            if (ir == null)
-                throw new IllegalArgumentException("No available image readers.");
-            iw = ImageIO.getImageWriter(ir);
-            if (iw == null)
-                throw new IllegalArgumentException("No available image writers.");
-            ios = ImageIO.createImageOutputStream(output);
-            iw.setOutput(ios);
+    private Writable createFunction(final Geometry geometry) {
+        return new Writable() {
+            public void write(ImageReader reader, ImageWriter writer) throws IOException {
+                final int N = reader.getNumImages(true);
+                IIOImage[] imgs = new IIOImage[N];
+                for (int i = 0; i < N; i++) {
+                    BufferedImage bimg = reader.read(i);
+                    Dimension dim = geometry.scale(bimg.getWidth(), bimg.getHeight());
+                    int w = (int) dim.getWidth();
+                    int h = (int) dim.getHeight();
+                    ColorModel cm = bimg.getColorModel();
+                    boolean transparentGIF = cm.hasAlpha() && (cm instanceof IndexColorModel);
+                    // convert if the image is not a transparent GIF
+                    if (!transparentGIF && (w != bimg.getWidth() || h != bimg.getHeight())) {
+                        BufferedImage buf;
+                        if (cm instanceof IndexColorModel)
+                            buf = new BufferedImage(w, h, bimg.getType(), (IndexColorModel) cm);
+                        else
+                            buf = new BufferedImage(w, h, bimg.getType());
+                        Graphics2D g2d = buf.createGraphics();
+                        g2d.setRenderingHint(
+                                RenderingHints.KEY_INTERPOLATION,
+                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                        g2d.drawImage(bimg, 0, 0, w, h, null);
+                        g2d.dispose();
+                        imgs[i] = new IIOImage(buf, null, null);
 
-            final int N = ir.getNumImages(true);
-            IIOImage[] imgs = new IIOImage[N];
-            for (int i = 0; i < N; i++) {
-                BufferedImage bimg = ir.read(i);
-                Dimension dim = geometry.scale(bimg.getWidth(), bimg.getHeight());
-                int w = (int) dim.getWidth();
-                int h = (int) dim.getHeight();
-                ColorModel cm = bimg.getColorModel();
-                boolean transparentGIF = cm.hasAlpha() && (cm instanceof IndexColorModel);
-                // convert if the image is not a transparent GIF
-                if (!transparentGIF && (w != bimg.getWidth() || h != bimg.getHeight())) {
-                    BufferedImage buf;
-                    if (cm instanceof IndexColorModel)
-                        buf = new BufferedImage(w, h, bimg.getType(), (IndexColorModel) cm);
-                    else
-                        buf = new BufferedImage(w, h, bimg.getType());
-                    Graphics2D g2d = buf.createGraphics();
-                    g2d.setRenderingHint(
-                            RenderingHints.KEY_INTERPOLATION,
-                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                    g2d.drawImage(bimg, 0, 0, w, h, null);
-                    g2d.dispose();
-                    imgs[i] = new IIOImage(buf, null, null);
-
+                    } else {
+                        imgs[i] = new IIOImage(bimg, null, null);
+                    }
+                }
+                // write images
+                if (imgs.length == 1) {
+                    writer.write(imgs[0]);
                 } else {
-                    imgs[i] = new IIOImage(bimg, null, null);
+                    writer.prepareWriteSequence(reader.getStreamMetadata());
+                    for (int i = 0; i < imgs.length; i++) {
+                        writer.writeToSequence(imgs[i], null);
+                    }
+                    writer.endWriteSequence();
                 }
             }
-            // write images
-            if (imgs.length == 1) {
-                iw.write(imgs[0]);
-            } else {
-                iw.prepareWriteSequence(ir.getStreamMetadata());
-                for (int i = 0; i < imgs.length; i++) {
-                    iw.writeToSequence(imgs[i], null);
-                }
-                iw.endWriteSequence();
-            }
-
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            if (ir != null)
-                ir.dispose();
-            if (iw != null)
-                iw.dispose();
-            ImageUtils.flushQuietly(ios);
-        }
+        };
     }
 }

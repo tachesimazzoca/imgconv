@@ -1,0 +1,184 @@
+javax_imageio_jpeg_image_1.0
+ JPEGvariety
+  app0JFIF
+   - majorVersion : 1
+   - minorVersion : 2
+   - resUnits : 0
+   - Xdensity : 1
+   - Ydensity : 1
+   - thumbWidth : 0
+   - thumbHeight : 0
+ markerSequence
+  dqt
+   dqtable
+    - elementPrecision : 0
+    - qtableId : 0
+  dqt
+   dqtable
+    - elementPrecision : 0
+    - qtableId : 1
+  sof
+   - process : 0
+   - samplePrecision : 8
+   - numLines : 160
+   - samplesPerLine : 240
+   - numFrameComponents : 3
+   componentSpec
+    - componentId : 1
+    - HsamplingFactor : 2
+    - VsamplingFactor : 2
+    - QtableSelector : 0
+   componentSpec
+    - componentId : 2
+    - HsamplingFactor : 1
+    - VsamplingFactor : 1
+    - QtableSelector : 1
+   componentSpec
+    - componentId : 3
+    - HsamplingFactor : 1
+    - VsamplingFactor : 1
+    - QtableSelector : 1
+  dht
+   dhtable
+    - class : 0
+    - htableId : 0
+  dht
+   dhtable
+    - class : 1
+    - htableId : 0
+  dht
+   dhtable
+    - class : 0
+    - htableId : 1
+  dht
+   dhtable
+    - class : 1
+    - htableId : 1
+  sos
+   - numScanComponents : 3
+   - startSpectralSelection : 0
+   - endSpectralSelection : 63
+   - approxHigh : 0
+   - approxLow : 0
+   scanComponentSpec
+    - componentSelector : 1
+    - dcHuffTable : 0
+    - acHuffTable : 0
+   scanComponentSpec
+    - componentSelector : 2
+    - dcHuffTable : 1
+    - acHuffTable : 1
+   scanComponentSpec
+    - componentSelector : 3
+    - dcHuffTable : 1
+    - acHuffTable : 1
+javax_imageio_1.0
+ Chroma
+  ColorSpaceType
+   - name : YCbCr
+  NumChannels
+   - value : 3
+ Compression
+  CompressionTypeName
+   - value : JPEG
+  Lossless
+   - value : FALSE
+  NumProgressiveScans
+   - value : 1
+ Dimension
+  PixelAspectRatio
+   - value : 1.0
+  ImageOrientation
+   - value : normal
+javax_imageio_jpeg_image_1.0
+ JPEGvariety
+  app0JFIF
+   - majorVersion : 1
+   - minorVersion : 2
+   - resUnits : 0
+   - Xdensity : 1
+   - Ydensity : 1
+   - thumbWidth : 0
+   - thumbHeight : 0
+ markerSequence
+  dqt
+   dqtable
+    - elementPrecision : 0
+    - qtableId : 0
+  dqt
+   dqtable
+    - elementPrecision : 0
+    - qtableId : 1
+  sof
+   - process : 0
+   - samplePrecision : 8
+   - numLines : 160
+   - samplesPerLine : 240
+   - numFrameComponents : 3
+   componentSpec
+    - componentId : 1
+    - HsamplingFactor : 2
+    - VsamplingFactor : 2
+    - QtableSelector : 0
+   componentSpec
+    - componentId : 2
+    - HsamplingFactor : 1
+    - VsamplingFactor : 1
+    - QtableSelector : 1
+   componentSpec
+    - componentId : 3
+    - HsamplingFactor : 1
+    - VsamplingFactor : 1
+    - QtableSelector : 1
+  dht
+   dhtable
+    - class : 0
+    - htableId : 0
+  dht
+   dhtable
+    - class : 1
+    - htableId : 0
+  dht
+   dhtable
+    - class : 0
+    - htableId : 1
+  dht
+   dhtable
+    - class : 1
+    - htableId : 1
+  sos
+   - numScanComponents : 3
+   - startSpectralSelection : 0
+   - endSpectralSelection : 63
+   - approxHigh : 0
+   - approxLow : 0
+   scanComponentSpec
+    - componentSelector : 1
+    - dcHuffTable : 0
+    - acHuffTable : 0
+   scanComponentSpec
+    - componentSelector : 2
+    - dcHuffTable : 1
+    - acHuffTable : 1
+   scanComponentSpec
+    - componentSelector : 3
+    - dcHuffTable : 1
+    - acHuffTable : 1
+javax_imageio_1.0
+ Chroma
+  ColorSpaceType
+   - name : YCbCr
+  NumChannels
+   - value : 3
+ Compression
+  CompressionTypeName
+   - value : JPEG
+  Lossless
+   - value : FALSE
+  NumProgressiveScans
+   - value : 1
+ Dimension
+  PixelAspectRatio
+   - value : 1.0
+  ImageOrientation
+   - value : normal

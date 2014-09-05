@@ -13,14 +13,12 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-
 import com.github.tachesimazzoca.imgconv.ImageUtils;
 
 public class ImageUtilsTest {
     public class PassthruConverter implements Converter {
         public void convert(InputStream input, OutputStream output) throws IOException {
-            IOUtils.copy(input, output);
+            ImageUtils.copyLarge(input, output);
         }
     }
 
