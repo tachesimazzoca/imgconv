@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +31,46 @@ public class ImageUtilsTest {
             }
             output.close();
         }
+    }
+
+    private File openTestFile(String path) {
+        return new File(getClass().getResource("/test").getPath(), path);
+    }
+
+    @Test
+    public void testInspectJPEG() throws IOException {
+        Image image = ImageUtils.inspect(new FileInputStream(
+                openTestFile("/peacock_60x60_emphatic.jpg")));
+        assertEquals(Image.Format.JPEG, image.getFormat());
+        assertEquals(60, image.getWidth());
+        assertEquals(60, image.getHeight());
+    }
+
+    @Test
+    public void testInspectPNG() throws IOException {
+        Image image = ImageUtils.inspect(new FileInputStream(
+                openTestFile("/desktop_80x50_emphatic.png")));
+        assertEquals(Image.Format.PNG, image.getFormat());
+        assertEquals(80, image.getWidth());
+        assertEquals(50, image.getHeight());
+    }
+
+    @Test
+    public void testInspectGIF() throws IOException {
+        Image image = ImageUtils.inspect(new FileInputStream(
+                openTestFile("/cmyk_20x10_emphatic.gif")));
+        assertEquals(Image.Format.GIF, image.getFormat());
+        assertEquals(20, image.getWidth());
+        assertEquals(10, image.getHeight());
+    }
+
+    @Test
+    public void testInspectAnimationGIF() throws IOException {
+        Image image = ImageUtils.inspect(new FileInputStream(
+                openTestFile("/loader.gif")));
+        assertEquals(Image.Format.GIF, image.getFormat());
+        assertEquals(32, image.getWidth());
+        assertEquals(32, image.getHeight());
     }
 
     @Test

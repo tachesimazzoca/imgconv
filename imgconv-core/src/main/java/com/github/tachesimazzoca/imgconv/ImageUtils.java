@@ -12,37 +12,27 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
 public class ImageUtils {
+    private static final Readable<Image> INSPECT_FUNCTION = new Readable<Image>() {
+        @Override
+        public Image read(ImageReader reader) throws IOException {
+            if (reader.getNumImages(true) < 1) {
+                throw new IllegalArgumentException("The input has no images.");
+            }
+            IIOMetadata meta = reader.getImageMetadata(0);
+            return new Image(Image.Format.fromNativeMetadataFormatName(
+                    meta.getNativeMetadataFormatName()),
+                    reader.getWidth(0),
+                    reader.getHeight(0));
+        }
+    };
+
     private ImageUtils() {
         throw new UnsupportedOperationException();
-    }
-
-    public static void convert(
-            Iterable<Converter> converters,
-            InputStream input,
-            OutputStream output) throws IOException {
-        ByteArrayInputStream bais = null;
-        ByteArrayOutputStream baos = null;
-        try {
-            baos = new ByteArrayOutputStream();
-            copyLarge(input, baos);
-            bais = new ByteArrayInputStream(baos.toByteArray());
-            baos = new ByteArrayOutputStream();
-            for (Converter converter : converters) {
-                converter.convert(bais, baos);
-                bais = new ByteArrayInputStream(baos.toByteArray());
-                baos = new ByteArrayOutputStream();
-            }
-            copyLarge(bais, output);
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            closeQuietly(bais);
-            closeQuietly(baos);
-        }
     }
 
     public static long copyLarge(InputStream input, OutputStream output)
@@ -118,5 +108,38 @@ public class ImageUtils {
             closeQuietly(ios);
         }
         return result;
+    }
+
+    public static Image inspect(InputStream input) {
+        try {
+            return ImageUtils.withImageReader(input, INSPECT_FUNCTION);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static void convert(
+            Iterable<Converter> converters,
+            InputStream input,
+            OutputStream output) throws IOException {
+        ByteArrayInputStream bais = null;
+        ByteArrayOutputStream baos = null;
+        try {
+            baos = new ByteArrayOutputStream();
+            copyLarge(input, baos);
+            bais = new ByteArrayInputStream(baos.toByteArray());
+            baos = new ByteArrayOutputStream();
+            for (Converter converter : converters) {
+                converter.convert(bais, baos);
+                bais = new ByteArrayInputStream(baos.toByteArray());
+                baos = new ByteArrayOutputStream();
+            }
+            copyLarge(bais, output);
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            closeQuietly(bais);
+            closeQuietly(baos);
+        }
     }
 }
