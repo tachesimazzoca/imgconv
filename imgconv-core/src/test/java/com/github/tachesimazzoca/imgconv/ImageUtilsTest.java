@@ -12,9 +12,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.github.tachesimazzoca.imgconv.ImageUtils;
 
 public class ImageUtilsTest {
@@ -78,20 +75,17 @@ public class ImageUtilsTest {
         Converter passthru = new PassthruConverter();
         Converter blank = new BlankConverter();
 
-        List<Converter> converters = Arrays.asList(passthru, passthru, passthru);
-
         String source = "deadbeef";
         ByteArrayInputStream input;
         ByteArrayOutputStream output;
         input = new ByteArrayInputStream(source.getBytes());
         output = new ByteArrayOutputStream();
-        ImageUtils.convert(converters, input, output);
+        ImageUtils.convert(input, output, passthru, passthru, passthru);
         assertArrayEquals(source.getBytes(), output.toByteArray());
 
-        converters = Arrays.asList(passthru, blank, passthru);
         input = new ByteArrayInputStream(source.getBytes());
         output = new ByteArrayOutputStream();
-        ImageUtils.convert(converters, input, output);
+        ImageUtils.convert(input, output, passthru, blank, passthru);
         assertArrayEquals("        ".getBytes(), output.toByteArray());
     }
 }

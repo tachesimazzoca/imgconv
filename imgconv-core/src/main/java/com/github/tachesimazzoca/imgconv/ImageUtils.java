@@ -119,9 +119,9 @@ public class ImageUtils {
     }
 
     public static void convert(
-            Iterable<Converter> converters,
             InputStream input,
-            OutputStream output) throws IOException {
+            OutputStream output,
+            Converter... converters) throws IOException {
         ByteArrayInputStream bais = null;
         ByteArrayOutputStream baos = null;
         try {
