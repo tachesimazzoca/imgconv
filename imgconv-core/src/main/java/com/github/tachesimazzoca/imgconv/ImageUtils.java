@@ -57,46 +57,87 @@ public class ImageUtils {
         }
     }
 
+    private static ImageReader createImageReader(ImageInputStream input) throws IOException {
+        ImageReader ir;
+        Iterator<ImageReader> readers = ImageIO.getImageReaders(input);
+        if (readers != null && readers.hasNext()) {
+            ir = readers.next();
+            ir.setInput(input);
+        } else {
+            throw new IllegalArgumentException("No available image readers.");
+        }
+        return ir;
+    }
+
+    private static ImageWriter createImageWriter(
+            ImageOutputStream output, ImageReader reader) throws IOException {
+        ImageWriter iw = ImageIO.getImageWriter(reader);
+        if (iw == null)
+            throw new IllegalArgumentException("No available image writers.");
+        iw.setOutput(output);
+        return iw;
+    }
+
+    private static ImageWriter createImageWriter(
+            ImageOutputStream output, String formatName) throws IOException {
+        ImageWriter iw;
+        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(formatName);
+        if (writers != null && writers.hasNext()) {
+            iw = writers.next();
+            iw.setOutput(output);
+        } else {
+            throw new IllegalArgumentException("No available image writers.");
+        }
+        return iw;
+    }
+
     public static <T> T withImageReader(
             InputStream input, Readable<T> func) throws IOException {
-        return withImageReaderOrWriter(input, func, null, null);
+
+        ImageReader ir = null;
+        T result = null;
+
+        try {
+            ImageIO.setUseCache(false);
+            // reader
+            ImageInputStream iis = ImageIO.createImageInputStream(input);
+            ir = createImageReader(iis);
+            // apply function
+            result = func.read(ir);
+
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (ir != null)
+                ir.dispose();
+        }
+        return result;
+    }
+
+    public static void withImageWriter(InputStream input, OutputStream output,
+            Writable func) throws IOException {
+        withImageWriter(input, output, null, func);
     }
 
     public static void withImageWriter(
-            InputStream input, OutputStream output, Writable func) throws IOException {
-        withImageReaderOrWriter(input, null, output, func);
-    }
-
-    private static <T> T withImageReaderOrWriter(
-            InputStream input,
-            Readable<T> readFunc,
-            OutputStream output,
-            Writable writeFunc) throws IOException {
+            InputStream input, OutputStream output,
+            String formatName, Writable func) throws IOException {
         ImageReader ir = null;
         ImageWriter iw = null;
         ImageOutputStream ios = null;
-        T result = null;
         try {
             ImageIO.setUseCache(false);
+            // reader
             ImageInputStream iis = ImageIO.createImageInputStream(input);
-            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
-            if (readers != null && readers.hasNext()) {
-                ir = readers.next();
-                ir.setInput(iis);
-            }
-            if (ir == null)
-                throw new IllegalArgumentException("No available image readers.");
-
-            if (output == null) {
-                result = readFunc.read(ir);
-            } else {
-                iw = ImageIO.getImageWriter(ir);
-                if (iw == null)
-                    throw new IllegalArgumentException("No available image writers.");
-                ios = ImageIO.createImageOutputStream(output);
-                iw.setOutput(ios);
-                writeFunc.write(ir, iw);
-            }
+            ir = createImageReader(iis);
+            // writer
+            ios = ImageIO.createImageOutputStream(output);
+            if (formatName != null)
+                iw = createImageWriter(ios, formatName);
+            else
+                iw = createImageWriter(ios, ir);
+            // apply function
+            func.write(ir, iw);
 
         } catch (IOException e) {
             throw e;
@@ -107,7 +148,6 @@ public class ImageUtils {
                 iw.dispose();
             closeQuietly(ios);
         }
-        return result;
     }
 
     public static Image inspect(InputStream input) {
