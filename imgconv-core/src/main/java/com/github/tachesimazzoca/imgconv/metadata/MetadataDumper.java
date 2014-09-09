@@ -1,4 +1,4 @@
-package com.github.tachesimazzoca.imgconv;
+package com.github.tachesimazzoca.imgconv.metadata;
 
 import java.io.PrintWriter;
 import java.io.OutputStream;

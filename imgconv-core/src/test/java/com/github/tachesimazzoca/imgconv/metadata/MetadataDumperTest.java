@@ -1,4 +1,4 @@
-package com.github.tachesimazzoca.imgconv;
+package com.github.tachesimazzoca.imgconv.metadata;
 
 import static org.junit.Assert.*;
 
@@ -12,6 +12,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
+
+import com.github.tachesimazzoca.imgconv.ImageUtils;
+import com.github.tachesimazzoca.imgconv.Readable;
 
 public class MetadataDumperTest {
     private File openTestFile(String path) {
