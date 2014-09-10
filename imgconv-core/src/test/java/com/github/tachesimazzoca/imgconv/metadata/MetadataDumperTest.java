@@ -15,6 +15,7 @@ import javax.imageio.metadata.IIOMetadata;
 
 import com.github.tachesimazzoca.imgconv.ImageUtils;
 import com.github.tachesimazzoca.imgconv.Readable;
+import com.github.tachesimazzoca.imgconv.TestUtils;
 
 public class MetadataDumperTest {
     private File openTestFile(String path) {
@@ -42,22 +43,8 @@ public class MetadataDumperTest {
 
     @Test
     public void testInspectJPEG() throws IOException {
-        String expected = readFileToString(openTestFile("/peacock.jpg.dump"));
+        String expected = TestUtils.readFileToString(openTestFile("/peacock.jpg.dump"));
         String actual = inspect(new FileInputStream(openTestFile("/peacock.jpg")));
         assertEquals(expected, actual);
-    }
-
-    private String readFileToString(File f) throws IOException {
-        FileInputStream input = new FileInputStream(f);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        try {
-            ImageUtils.copyLarge(input, output);
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            ImageUtils.closeQuietly(input);
-            ImageUtils.closeQuietly(output);
-        }
-        return output.toString();
     }
 }

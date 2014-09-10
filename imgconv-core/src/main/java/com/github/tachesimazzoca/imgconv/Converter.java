@@ -1,16 +1,13 @@
 package com.github.tachesimazzoca.imgconv;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.imageio.IIOImage;
 
 public interface Converter {
     /**
-     * Converts an image stream.
+     * Converts an array of IIOImage.
      * 
-     * @param input
-     * @param output
-     * @throws IOException
+     * @param images
+     * @return a converted array of IIOImage
      */
-    void convert(InputStream input, OutputStream output) throws IOException;
+    public IIOImage[] convert(IIOImage[] images);
 }

@@ -9,9 +9,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.github.tachesimazzoca.imgconv.ImageUtils;
 import com.github.tachesimazzoca.imgconv.Converter;
 import com.github.tachesimazzoca.imgconv.Geometry;
+import com.github.tachesimazzoca.imgconv.ImageUtils;
+
+import com.github.tachesimazzoca.imgconv.TestUtils;
 
 public class SizeConverterTest {
     private File openTestFile(String path) {
@@ -22,8 +24,8 @@ public class SizeConverterTest {
             throws IOException {
         FileInputStream input = new FileInputStream(source);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        converter.convert(input, output);
-        assertArrayEquals(readFileToByteArray(expected), output.toByteArray());
+        ImageUtils.convert(input, output, null, converter);
+        assertArrayEquals(TestUtils.readFileToByteArray(expected), output.toByteArray());
     }
 
     @Test
@@ -89,19 +91,5 @@ public class SizeConverterTest {
                 new SizeConverter(20, 20, Geometry.ScalingStrategy.MINIMUM),
                 openTestFile("/loader.gif"),
                 openTestFile("/loader.gif"));
-    }
-
-    private byte[] readFileToByteArray(File f) throws IOException {
-        FileInputStream input = new FileInputStream(f);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        try {
-            ImageUtils.copyLarge(input, output);
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            ImageUtils.closeQuietly(input);
-            ImageUtils.closeQuietly(output);
-        }
-        return output.toByteArray();
     }
 }

@@ -1,7 +1,5 @@
 package com.github.tachesimazzoca.imgconv;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.IOException;
@@ -12,9 +10,14 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
+import javax.imageio.IIOImage;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
+
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 
 public class ImageUtils {
     private static final Readable<Image> INSPECT_FUNCTION = new Readable<Image>() {
@@ -35,19 +38,7 @@ public class ImageUtils {
         throw new UnsupportedOperationException();
     }
 
-    public static long copyLarge(InputStream input, OutputStream output)
-            throws IOException {
-        byte[] buffer = new byte[4096];
-        long count = 0;
-        int n = 0;
-        while (-1 != (n = input.read(buffer))) {
-            output.write(buffer, 0, n);
-            count += n;
-        }
-        return count;
-    }
-
-    public static void closeQuietly(Closeable closeable) {
+    private static void closeQuietly(Closeable closeable) {
         try {
             if (closeable != null) {
                 closeable.close();
@@ -161,25 +152,75 @@ public class ImageUtils {
     public static void convert(
             InputStream input,
             OutputStream output,
-            Converter... converters) throws IOException {
-        ByteArrayInputStream bais = null;
-        ByteArrayOutputStream baos = null;
+            final String formatName,
+            final Converter... converters) throws IOException {
+
+        ImageReader ir = null;
+        ImageWriter iw = null;
+        ImageOutputStream ios = null;
         try {
-            baos = new ByteArrayOutputStream();
-            copyLarge(input, baos);
-            bais = new ByteArrayInputStream(baos.toByteArray());
-            baos = new ByteArrayOutputStream();
-            for (Converter converter : converters) {
-                converter.convert(bais, baos);
-                bais = new ByteArrayInputStream(baos.toByteArray());
-                baos = new ByteArrayOutputStream();
+            ImageIO.setUseCache(false);
+
+            // reader
+            ImageInputStream iis = ImageIO.createImageInputStream(input);
+            ir = createImageReader(iis);
+
+            // writer
+            ios = ImageIO.createImageOutputStream(output);
+            if (formatName != null)
+                iw = createImageWriter(ios, formatName);
+            else
+                iw = createImageWriter(ios, ir);
+
+            // converters
+            int N = ir.getNumImages(true);
+            IIOImage[] imgs = new IIOImage[N];
+            for (int i = 0; i < N; i++) {
+                imgs[i] = ir.readAll(i, null);
             }
-            copyLarge(bais, output);
+            for (int i = 0; i < converters.length; i++) {
+                imgs = converters[i].convert(imgs);
+            }
+            if (imgs.length < 1)
+                throw new IllegalArgumentException("No converted images");
+
+            if (formatName == null || formatName.equals(ir.getFormatName())) {
+                // write images
+                if (imgs.length == 1) {
+                    iw.write(imgs[0]);
+                } else {
+                    iw.prepareWriteSequence(imgs[0].getMetadata());
+                    for (int i = 0; i < imgs.length; i++) {
+                        iw.writeToSequence(imgs[i], null);
+                    }
+                    iw.endWriteSequence();
+                }
+            } else {
+                // write a re-format image
+                BufferedImage bimg = ir.read(0);
+                if (formatName.equals("png") || !bimg.getColorModel().hasAlpha()) {
+                    iw.write(new IIOImage(bimg, null, null));
+                } else {
+                    BufferedImage buf = new BufferedImage(bimg.getWidth(), bimg.getHeight(),
+                            BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g2d = buf.createGraphics();
+                    g2d.setRenderingHint(
+                            RenderingHints.KEY_INTERPOLATION,
+                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    g2d.drawImage(bimg, 0, 0, bimg.getWidth(), bimg.getHeight(), null);
+                    g2d.dispose();
+                    iw.write(new IIOImage(buf, null, null));
+                }
+            }
+
         } catch (IOException e) {
             throw e;
         } finally {
-            closeQuietly(bais);
-            closeQuietly(baos);
+            if (ir != null)
+                ir.dispose();
+            if (iw != null)
+                iw.dispose();
+            closeQuietly(ios);
         }
     }
 }

@@ -4,32 +4,12 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-
-import com.github.tachesimazzoca.imgconv.ImageUtils;
 
 public class ImageUtilsTest {
-    public class PassthruConverter implements Converter {
-        public void convert(InputStream input, OutputStream output) throws IOException {
-            ImageUtils.copyLarge(input, output);
-        }
-    }
-
-    public class BlankConverter implements Converter {
-        public void convert(InputStream input, OutputStream output) throws IOException {
-            while (input.read() != -1) {
-                output.write(' ');
-            }
-            output.close();
-        }
-    }
-
     private File openTestFile(String path) {
         return new File(getClass().getResource("/test").getPath(), path);
     }
@@ -72,20 +52,22 @@ public class ImageUtilsTest {
 
     @Test
     public void testConvert() throws IOException {
-        Converter passthru = new PassthruConverter();
-        Converter blank = new BlankConverter();
-
-        String source = "deadbeef";
-        ByteArrayInputStream input;
-        ByteArrayOutputStream output;
-        input = new ByteArrayInputStream(source.getBytes());
-        output = new ByteArrayOutputStream();
-        ImageUtils.convert(input, output, passthru, passthru, passthru);
-        assertArrayEquals(source.getBytes(), output.toByteArray());
-
-        input = new ByteArrayInputStream(source.getBytes());
-        output = new ByteArrayOutputStream();
-        ImageUtils.convert(input, output, passthru, blank, passthru);
-        assertArrayEquals("        ".getBytes(), output.toByteArray());
+        String[][] ptn = {
+                { "peacock", "jpg", "gif" },
+                { "peacock", "jpg", "png" },
+                { "loader", "gif", "jpg" },
+                { "loader", "gif", "png" },
+                { "cmyk", "gif", "jpg" },
+                { "cmyk", "gif", "png" },
+                { "desktop", "png", "jpg" },
+                { "desktop", "png", "gif" } };
+        for (int i = 0; i < ptn.length; i++) {
+            FileInputStream fis = new FileInputStream(openTestFile(
+                    "/" + ptn[i][0] + "." + ptn[i][1]));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageUtils.convert(fis, baos, ptn[i][2]);
+            assertArrayEquals(TestUtils.readFileToByteArray(openTestFile(
+                    "/" + ptn[i][0] + "." + ptn[i][2])), baos.toByteArray());
+        }
     }
 }
