@@ -10,6 +10,18 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class ImageUtilsTest {
+    private static class TestPattern {
+        public final String source;
+        public final String destination;
+        public final ConvertOption convertOption;
+
+        private TestPattern(String source, String destination, ConvertOption convertOption) {
+            this.source = source;
+            this.destination = destination;
+            this.convertOption = convertOption;
+        }
+    }
+
     private File openTestFile(String path) {
         return new File(getClass().getResource("/test").getPath(), path);
     }
@@ -50,24 +62,105 @@ public class ImageUtilsTest {
         assertEquals(32, image.getHeight());
     }
 
-    @Test
-    public void testConvert() throws IOException {
-        String[][] ptn = {
-                { "peacock", "jpg", "gif" },
-                { "peacock", "jpg", "png" },
-                { "loader", "gif", "jpg" },
-                { "loader", "gif", "png" },
-                { "cmyk", "gif", "jpg" },
-                { "cmyk", "gif", "png" },
-                { "desktop", "png", "jpg" },
-                { "desktop", "png", "gif" } };
-        for (int i = 0; i < ptn.length; i++) {
-            FileInputStream fis = new FileInputStream(openTestFile(
-                    "/" + ptn[i][0] + "." + ptn[i][1]));
+    private void runTestPatterns(TestPattern... patterns)
+            throws IOException {
+        for (int i = 0; i < patterns.length; i++) {
+            FileInputStream fis = new FileInputStream(openTestFile(patterns[i].source));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageUtils.convert(fis, baos, ptn[i][2]);
-            assertArrayEquals(TestUtils.readFileToByteArray(openTestFile(
-                    "/" + ptn[i][0] + "." + ptn[i][2])), baos.toByteArray());
+            ImageUtils.convert(fis, baos, patterns[i].convertOption);
+            assertArrayEquals("patterns[" + i + "]", TestUtils.readFileToByteArray(
+                    openTestFile(patterns[i].destination)), baos.toByteArray());
         }
+    }
+
+    @Test
+    public void testResizeJPEG() throws IOException {
+        runTestPatterns(
+                new TestPattern("/peacock.jpg", "/peacock_60x60_emphatic.jpg",
+                        ConvertOption.builder().geometry(new Geometry(
+                                60, 60, Geometry.ScalingStrategy.EMPHATIC)).build()),
+
+                new TestPattern("/peacock.jpg", "/peacock_60x60_maximum.jpg",
+                        ConvertOption.builder().geometry(new Geometry(
+                                60, 60, Geometry.ScalingStrategy.MAXIMUM)).build()),
+
+                new TestPattern("/peacock.jpg", "/peacock_200x200_minimum.jpg",
+                        ConvertOption.builder().geometry(new Geometry(
+                                200, 200, Geometry.ScalingStrategy.MINIMUM)).build()));
+    }
+
+    @Test
+    public void testResizePNG() throws IOException {
+        runTestPatterns(
+                new TestPattern("/desktop.png", "/desktop_80x50_emphatic.png",
+                        ConvertOption.builder().geometry(new Geometry(
+                                80, 50, Geometry.ScalingStrategy.EMPHATIC)).build()),
+
+                new TestPattern("/desktop.png", "/desktop_80x50_maximum.png",
+                        ConvertOption.builder().geometry(new Geometry(
+                                80, 50, Geometry.ScalingStrategy.MAXIMUM)).build()),
+
+                new TestPattern("/desktop.png", "/desktop_80x50_minimum.png",
+                        ConvertOption.builder().geometry(new Geometry(
+                                80, 50, Geometry.ScalingStrategy.MINIMUM)).build()));
+    }
+
+    @Test
+    public void testResizeGIF() throws IOException {
+        runTestPatterns(
+                new TestPattern("/cmyk.gif", "/cmyk_20x10_emphatic.gif",
+                        ConvertOption.builder().geometry(new Geometry(
+                                20, 10, Geometry.ScalingStrategy.EMPHATIC)).build()),
+
+                new TestPattern("/cmyk.gif", "/cmyk_20x10_maximum.gif",
+                        ConvertOption.builder().geometry(new Geometry(
+                                20, 10, Geometry.ScalingStrategy.MAXIMUM)).build()),
+
+                new TestPattern("/cmyk.gif", "/cmyk_80x60_minimum.gif",
+                        ConvertOption.builder().geometry(new Geometry(
+                                80, 60, Geometry.ScalingStrategy.MINIMUM)).build()));
+    }
+
+    @Test
+    public void testResizeTransparentGIF() throws IOException {
+        // skip resizing if the GIF image has a transparent index.
+        runTestPatterns(
+                new TestPattern("/loader.gif", "/loader.gif",
+                        ConvertOption.builder().geometry(new Geometry(
+                                20, 20, Geometry.ScalingStrategy.EMPHATIC)).build()),
+
+                new TestPattern("/loader.gif", "/loader.gif",
+                        ConvertOption.builder().geometry(new Geometry(
+                                20, 20, Geometry.ScalingStrategy.MAXIMUM)).build()),
+
+                new TestPattern("/loader.gif", "/loader.gif",
+                        ConvertOption.builder().geometry(new Geometry(
+                                20, 20, Geometry.ScalingStrategy.MINIMUM)).build()));
+    }
+
+    @Test
+    public void testReformat() throws IOException {
+        final ConvertOption JPG_FORMAT =
+                ConvertOption.builder().format(ConvertOption.Format.JPEG).build();
+        final ConvertOption PNG_FORMAT =
+                ConvertOption.builder().format(ConvertOption.Format.PNG).build();
+        final ConvertOption GIF_FORMAT =
+                ConvertOption.builder().format(ConvertOption.Format.GIF).build();
+        runTestPatterns(
+                new TestPattern("/peacock.jpg", "/peacock.gif", GIF_FORMAT),
+                new TestPattern("/peacock.jpg", "/peacock.png", PNG_FORMAT),
+                new TestPattern("/loader.gif", "/loader.jpg", JPG_FORMAT),
+                new TestPattern("/loader.gif", "/loader.png", PNG_FORMAT),
+                new TestPattern("/cmyk.gif", "/cmyk.jpg", JPG_FORMAT),
+                new TestPattern("/cmyk.gif", "/cmyk.png", PNG_FORMAT),
+                new TestPattern("/desktop.png", "/desktop.jpg", JPG_FORMAT),
+                new TestPattern("/desktop.png", "/desktop.gif", GIF_FORMAT));
+    }
+
+    @Test
+    public void testStrip() throws IOException {
+        final ConvertOption STRIP_ON =
+                ConvertOption.builder().flag(ConvertOption.Flag.STRIP).build();
+        runTestPatterns(new TestPattern("/desktop.png", "/desktop_strip.png", STRIP_ON));
     }
 }

@@ -15,11 +15,14 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 
-public class ImageUtils {
+public final class ImageUtils {
     private static final Readable<Image> INSPECT_FUNCTION = new Readable<Image>() {
         @Override
         public Image read(ImageReader reader) throws IOException {
@@ -152,8 +155,8 @@ public class ImageUtils {
     public static void convert(
             InputStream input,
             OutputStream output,
-            final String formatName,
-            final Converter... converters) throws IOException {
+            ConvertOption option,
+            Converter... converters) throws IOException {
 
         ImageReader ir = null;
         ImageWriter iw = null;
@@ -167,25 +170,41 @@ public class ImageUtils {
 
             // writer
             ios = ImageIO.createImageOutputStream(output);
-            if (formatName != null)
+            String formatName = option.getFormat().getFormatName();
+            if (!formatName.isEmpty())
                 iw = createImageWriter(ios, formatName);
             else
                 iw = createImageWriter(ios, ir);
 
-            // converters
+            // prepare an array of IIOImage
             int N = ir.getNumImages(true);
             IIOImage[] imgs = new IIOImage[N];
             for (int i = 0; i < N; i++) {
                 imgs[i] = ir.readAll(i, null);
             }
+
+            // strip
+            if (option.hasFlag(ConvertOption.Flag.STRIP)) {
+                for (int i = 0; i < imgs.length; i++) {
+                    imgs[i].setThumbnails(null);
+                    imgs[i].setMetadata(null);
+                }
+            }
+
+            // execute plug-ins
             for (int i = 0; i < converters.length; i++) {
                 imgs = converters[i].convert(imgs);
             }
             if (imgs.length < 1)
                 throw new IllegalArgumentException("No converted images");
 
-            if (formatName == null || formatName.equals(ir.getFormatName())) {
-                // write images
+            // resize
+            if (option.hasGeometry()) {
+                imgs = resize(imgs, option.getGeometry());
+            }
+
+            // write images
+            if (formatName.isEmpty() || formatName.equals(ir.getFormatName())) {
                 if (imgs.length == 1) {
                     iw.write(imgs[0]);
                 } else {
@@ -196,7 +215,7 @@ public class ImageUtils {
                     iw.endWriteSequence();
                 }
             } else {
-                // write a re-format image
+                // convert file format
                 BufferedImage bimg = ir.read(0);
                 if (formatName.equals("png") || !bimg.getColorModel().hasAlpha()) {
                     iw.write(new IIOImage(bimg, null, null));
@@ -222,5 +241,36 @@ public class ImageUtils {
                 iw.dispose();
             closeQuietly(ios);
         }
+    }
+
+    public static IIOImage[] resize(IIOImage[] images, Geometry geometry) {
+        IIOImage[] imgs = new IIOImage[images.length];
+        for (int i = 0; i < images.length; i++) {
+            BufferedImage bimg = (BufferedImage) images[i].getRenderedImage();
+            Dimension dim = geometry.scale(bimg.getWidth(),
+                    bimg.getHeight());
+            int w = (int) dim.getWidth();
+            int h = (int) dim.getHeight();
+            ColorModel cm = bimg.getColorModel();
+            boolean transparentGIF = cm.hasAlpha() && (cm instanceof IndexColorModel);
+            // convert if the image is not a transparent GIF
+            if (!transparentGIF && (w != bimg.getWidth() || h != bimg.getHeight())) {
+                BufferedImage buf;
+                if (cm instanceof IndexColorModel)
+                    buf = new BufferedImage(w, h, bimg.getType(), (IndexColorModel) cm);
+                else
+                    buf = new BufferedImage(w, h, bimg.getType());
+                Graphics2D g2d = buf.createGraphics();
+                g2d.setRenderingHint(
+                        RenderingHints.KEY_INTERPOLATION,
+                        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2d.drawImage(bimg, 0, 0, w, h, null);
+                g2d.dispose();
+                imgs[i] = new IIOImage(buf, null, null);
+            } else {
+                imgs[i] = images[i];
+            }
+        }
+        return imgs;
     }
 }

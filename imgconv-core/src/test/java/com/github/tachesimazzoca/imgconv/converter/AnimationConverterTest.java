@@ -10,11 +10,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.github.tachesimazzoca.imgconv.Converter;
+import com.github.tachesimazzoca.imgconv.ConvertOption;
 import com.github.tachesimazzoca.imgconv.ImageUtils;
 
 import com.github.tachesimazzoca.imgconv.TestUtils;
 
 public class AnimationConverterTest {
+    private static final ConvertOption DEFAULT_CONVERT_OPTION =
+            ConvertOption.builder().build();
+
     private File openTestFile(String path) {
         return new File(getClass().getResource("/test").getPath(), path);
     }
@@ -24,7 +28,7 @@ public class AnimationConverterTest {
         FileInputStream input = new FileInputStream(openTestFile("/loader.gif"));
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Converter converter = new AnimationConverter(1);
-        ImageUtils.convert(input, output, null, converter);
+        ImageUtils.convert(input, output, DEFAULT_CONVERT_OPTION, converter);
         assertArrayEquals(TestUtils.readFileToByteArray(
                 openTestFile("/loader_1time.gif")), output.toByteArray());
     }
@@ -34,7 +38,7 @@ public class AnimationConverterTest {
         FileInputStream input = new FileInputStream(openTestFile("/loader.gif"));
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Converter converter = new AnimationConverter(3);
-        ImageUtils.convert(input, output, null, converter);
+        ImageUtils.convert(input, output, DEFAULT_CONVERT_OPTION, converter);
         assertArrayEquals(TestUtils.readFileToByteArray(
                 openTestFile("/loader_3times.gif")), output.toByteArray());
     }
