@@ -181,6 +181,10 @@ public final class ImageUtils {
             IIOImage[] imgs = new IIOImage[N];
             for (int i = 0; i < N; i++) {
                 imgs[i] = ir.readAll(i, null);
+                IIOMetadata metadata = imgs[i].getMetadata();
+                if (metadata.isReadOnly())
+                    metadata = iw.getDefaultImageMetadata(ir.getRawImageType(i), null);
+                imgs[i].setMetadata(metadata);
             }
 
             // strip
