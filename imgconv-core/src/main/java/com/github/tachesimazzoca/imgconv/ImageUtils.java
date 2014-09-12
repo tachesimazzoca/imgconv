@@ -170,12 +170,14 @@ public final class ImageUtils {
 
             // writer
             ios = ImageIO.createImageOutputStream(output);
-            String formatName = option.getFormat().getFormatName();
-            if (!formatName.isEmpty())
+            String formatName;
+            if (option.hasFormat()) {
+                formatName = option.getFormat().getFormatName();
                 iw = createImageWriter(ios, formatName);
-            else
+            } else {
+                formatName = null;
                 iw = createImageWriter(ios, ir);
-
+            }
             // prepare an array of IIOImage
             int N = ir.getNumImages(true);
             IIOImage[] imgs = new IIOImage[N];
@@ -208,7 +210,7 @@ public final class ImageUtils {
             }
 
             // write images
-            if (formatName.isEmpty() || formatName.equals(ir.getFormatName())) {
+            if (formatName == null || formatName.equals(ir.getFormatName())) {
                 if (imgs.length == 1) {
                     iw.write(imgs[0]);
                 } else {

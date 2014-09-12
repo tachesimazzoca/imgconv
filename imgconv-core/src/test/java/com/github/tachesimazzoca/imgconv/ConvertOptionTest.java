@@ -10,7 +10,8 @@ public class ConvertOptionTest {
     @Test
     public void testDefaultOption() {
         ConvertOption option = ConvertOption.builder().build();
-        assertEquals(ConvertOption.Format.ANY, option.getFormat());
+        assertFalse(option.hasFormat());
+        assertFalse(option.hasGeometry());
         assertFalse(option.hasFlag(ConvertOption.Flag.STRIP));
     }
 
@@ -20,7 +21,9 @@ public class ConvertOptionTest {
                 .format(ConvertOption.Format.JPEG)
                 .geometry(new Geometry(320, 240, Geometry.ScalingStrategy.MAXIMUM))
                 .flag(ConvertOption.Flag.STRIP).build();
+        assertTrue(option.hasFormat());
         assertEquals(ConvertOption.Format.JPEG, option.getFormat());
+        assertTrue(option.hasGeometry());
         Dimension dim = option.getGeometry().scale(640, 240);
         assertEquals(320, (int) dim.getWidth());
         assertEquals(120, (int) dim.getHeight());
