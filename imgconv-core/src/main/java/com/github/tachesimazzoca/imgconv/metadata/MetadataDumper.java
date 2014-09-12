@@ -9,8 +9,19 @@ import javax.imageio.metadata.IIOMetadata;
 import org.w3c.dom.Node;
 import org.w3c.dom.NamedNodeMap;
 
+/**
+ * A class is used to dump IIOMetadata object.
+ * 
+ * @see javax.imageio.metadata.IIOMetadata
+ */
 public class MetadataDumper {
-    public void dumpAsText(IIOMetadata metadata, OutputStream output) {
+    /**
+     * Writes a dump of the metadata to the output stream.
+     * 
+     * @param metadata the metadata to read from
+     * @param output the output stream to write to
+     */
+    public void dump(IIOMetadata metadata, OutputStream output) {
         PrintWriter pw = new PrintWriter(output);
         String[] names = metadata.getMetadataFormatNames();
         for (int i = 0; i < names.length; i++) {

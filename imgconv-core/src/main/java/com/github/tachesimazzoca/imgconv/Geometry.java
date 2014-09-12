@@ -2,6 +2,9 @@ package com.github.tachesimazzoca.imgconv;
 
 import java.awt.Dimension;
 
+/**
+ * Represents the preferred size of the image.
+ */
 public class Geometry {
     /**
      * The no-value.
@@ -36,6 +39,9 @@ public class Geometry {
         this.scalingStrategy = scalingStrategy;
     }
 
+    /**
+     * Available strategies to scale an image to the desired width and height.
+     */
     public enum ScalingStrategy {
         /**
          * Width and height emphatically given, original aspect ratio ignored.

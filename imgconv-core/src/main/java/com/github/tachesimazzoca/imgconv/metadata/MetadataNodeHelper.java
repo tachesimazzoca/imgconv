@@ -2,6 +2,12 @@ package com.github.tachesimazzoca.imgconv.metadata;
 
 import javax.imageio.metadata.IIOMetadataNode;
 
+/**
+ * Instances of classes that implement this interface helps to access
+ * IIOImageMetadataNode.
+ * 
+ * @see javax.imageio.metadata.IIOMetadataNode
+ */
 public interface MetadataNodeHelper {
     /**
      * Returns a comment text in a given IIOMetadataNode object.

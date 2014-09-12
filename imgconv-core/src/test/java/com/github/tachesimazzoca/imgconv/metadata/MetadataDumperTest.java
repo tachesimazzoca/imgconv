@@ -33,7 +33,7 @@ public class MetadataDumperTest {
                     IIOMetadata meta = ir.getImageMetadata(i);
                     String[] names = meta.getMetadataFormatNames();
                     for (int j = 0; j < names.length; j++) {
-                        dumper.dumpAsText(meta, baos);
+                        dumper.dump(meta, baos);
                     }
                 }
                 return baos.toString();

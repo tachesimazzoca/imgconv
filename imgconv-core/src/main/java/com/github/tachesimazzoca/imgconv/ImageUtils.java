@@ -22,6 +22,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 
+/**
+ * Image file manipulation utilities.
+ */
 public final class ImageUtils {
     private static final Readable<Image> INSPECT_FUNCTION = new Readable<Image>() {
         @Override
@@ -85,6 +88,15 @@ public final class ImageUtils {
         return iw;
     }
 
+    /**
+     * Applies the given function with {@code ImageReader}. After applying it,
+     * the reader will be disposed automatically.
+     * 
+     * @param input the input stream to read from
+     * @param func the function with {@code ImageReader}
+     * @return the value the given function returns.
+     * @throws IOException
+     */
     public static <T> T withImageReader(
             InputStream input, Readable<T> func) throws IOException {
 
@@ -108,11 +120,33 @@ public final class ImageUtils {
         return result;
     }
 
+    /**
+     * Applies the given function with {@code Image(Reader|Writer)}. After
+     * applying it, the reader and writer will be disposed and the output stream
+     * will be closed automatically.
+     * 
+     * @param input the input stream to read from
+     * @param output the output stream to write to
+     * @param func the function with {@code Image(Reader|Writer)}
+     * @throws IOException
+     */
     public static void withImageWriter(InputStream input, OutputStream output,
             Writable func) throws IOException {
         withImageWriter(input, output, null, func);
     }
 
+    /**
+     * Applies the given function with {@code ImageReader} and
+     * {@code ImageWriter} for the specified format name. After applying it, the
+     * reader and writer will be disposed and the output stream will be closed
+     * automatically.
+     * 
+     * @param input the input stream to read from
+     * @param output the output stream to write to
+     * @param formatName the output image format name
+     * @param func the function with {@code Image(Reader|Writer)}
+     * @throws IOException
+     */
     public static void withImageWriter(
             InputStream input, OutputStream output,
             String formatName, Writable func) throws IOException {
@@ -144,6 +178,14 @@ public final class ImageUtils {
         }
     }
 
+    /**
+     * Returns the image information by reading the input stream.
+     * 
+     * @param input the input stream of the image
+     * @return the information of the image.
+     * @throws java.lang.IllegalArgumentException if the input stream is not a
+     *         valid image.
+     */
     public static Image inspect(InputStream input) {
         try {
             return ImageUtils.withImageReader(input, INSPECT_FUNCTION);
@@ -152,6 +194,26 @@ public final class ImageUtils {
         }
     }
 
+    /**
+     * Reads the input stream of the image and writes a converted image to the
+     * output stream.
+     * 
+     * <pre>
+     * 
+     * InputStream input = new FileInputStream(new File(&quot;/path/to/source.png&quot;));
+     * OutputStream output = new FileOutputStream(new File(&quot;/path/to/dest.jpg&quot;));
+     * ConvertOption option = ConvertOption.builder()
+     *         .geometry(new Geometry(64, 48))
+     *         .flag(ConvertOption.Flag.STRIP);
+     * ImageUtils.convert(input, output, option);
+     * </pre>
+     * 
+     * @param input the input stream to read from
+     * @param output the output steam to write to
+     * @param option convert options
+     * @param converters additional conversion process
+     * @throws IOException
+     */
     public static void convert(
             InputStream input,
             OutputStream output,
@@ -249,6 +311,17 @@ public final class ImageUtils {
         }
     }
 
+    /**
+     * Returns an array of resized images.
+     * 
+     * <p>
+     * <em>If the image is a transparent GIF, it will be skipped.</em>
+     * </p>
+     * 
+     * @param images the array of images
+     * @param geometry the preferred size of the image
+     * @return an array of resized images.
+     */
     public static IIOImage[] resize(IIOImage[] images, Geometry geometry) {
         IIOImage[] imgs = new IIOImage[images.length];
         for (int i = 0; i < images.length; i++) {

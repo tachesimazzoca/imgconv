@@ -4,9 +4,28 @@ import javax.imageio.IIOImage;
 
 import com.github.tachesimazzoca.imgconv.Converter;
 
+/**
+ * Reduces the number of images.
+ * 
+ * <pre>
+ * 
+ * // single image
+ * Converter noAnimation = new AnimationConverter(1);
+ * ImageUtil.convert(input, output, option, noAnination);
+ * 
+ * // skipped animation by reducing at most five images
+ * Converter atMostFiveImages = new AnimationConverter(5);
+ * ImageUtil.convert(input, output, option, atMostFiveImages);
+ * </pre>
+ */
 public class AnimationConverter implements Converter {
     private int maxImages;
 
+    /**
+     * Creates a new {@code AnimationConverter} object.
+     * 
+     * @param maxImages
+     */
     public AnimationConverter(int maxImages) {
         if (maxImages < 1)
             throw new IllegalArgumentException(

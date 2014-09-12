@@ -14,6 +14,14 @@ import com.github.tachesimazzoca.imgconv.metadata.JPEGMetadataNodeHelper;
 import com.github.tachesimazzoca.imgconv.metadata.PNGMetadataNodeHelper;
 import com.github.tachesimazzoca.imgconv.metadata.GIFMetadataNodeHelper;
 
+/**
+ * Sets the copyright comment for Japanese (DoCoMo|au) feature phones.
+ * 
+ * @see com.github.tachesimazzoca.imgconv.metadata.MetadataNodeHelper
+ * @see com.github.tachesimazzoca.imgconv.metadata.JPEGMetadataNodeHelper
+ * @see com.github.tachesimazzoca.imgconv.metadata.PNGMetadataNodeHelper
+ * @see com.github.tachesimazzoca.imgconv.metadata.GIFMetadataNodeHelper
+ */
 public class KetaiCopyguardConverter implements Converter {
     private final static String COPYGUARD_COMMENT = "kddi_copyright=on,copy=\"NO\"";
 

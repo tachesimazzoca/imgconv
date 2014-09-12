@@ -1,5 +1,8 @@
 package com.github.tachesimazzoca.imgconv;
 
+/**
+ * Represents the information of an image.
+ */
 public class Image {
     private final Format format;
     private final int width;
@@ -8,9 +11,9 @@ public class Image {
     /**
      * Creates a new <code>Image</code> object.
      * 
-     * @param format the specified format
-     * @param width the specified width
-     * @param height the specified height
+     * @param format the format of the image
+     * @param width the width of the image
+     * @param height the height of the image
      */
     public Image(Format format, int width, int height) {
         this.format = format;
@@ -39,19 +42,22 @@ public class Image {
         return height;
     }
 
+    /**
+     * Represents the format of an image.
+     */
     public enum Format {
         /**
-         * JPEG: image/jpeg
+         * JPEG: {@code javax_imageio_jpeg_image_1.0}
          */
         JPEG("javax_imageio_jpeg_image_1.0"),
 
         /**
-         * PNG: image/png
+         * PNG: {@code javax_imageio_png_1.0}
          */
         PNG("javax_imageio_png_1.0"),
 
         /**
-         * GIF: image/gif
+         * GIF: {@code javax_imageio_gif_image_1.0}
          */
         GIF("javax_imageio_gif_image_1.0");
 
@@ -62,7 +68,7 @@ public class Image {
         }
 
         /**
-         * Creates a new <code>Format</code> object with a name of native
+         * Creates a new <code>Format</code> object with the name of native
          * metadata format.
          * 
          * @param name name of native metadata format
