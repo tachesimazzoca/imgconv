@@ -27,10 +27,19 @@ public class GeometryTest {
 
     @Test
     public void testScaleEmphatic() {
-        Geometry geo = new Geometry(320, 240, Geometry.ScalingStrategy.EMPHATIC);
-        Dimension dim = geo.scale(1, 2);
-        assertEquals(320, (int) dim.getWidth());
-        assertEquals(240, (int) dim.getHeight());
+        int[][] wh = {
+                // 150x100
+                { 320, 240, 150, 100, 320, 240 },
+                { Geometry.NO_VALUE, Geometry.NO_VALUE, 150, 100, 150, 100 },
+                { Geometry.NO_VALUE, 240, 150, 100, 150, 240 },
+                { 320, Geometry.NO_VALUE, 150, 100, 320, 100 } };
+
+        for (int i = 0; i < wh.length; i++) {
+            Geometry geo = new Geometry(wh[i][0], wh[i][1], Geometry.ScalingStrategy.EMPHATIC);
+            Dimension dim = geo.scale(wh[i][2], wh[i][3]);
+            assertEquals(wh[i][4], (int) dim.getWidth());
+            assertEquals(wh[i][5], (int) dim.getHeight());
+        }
     }
 
     @Test
@@ -52,7 +61,6 @@ public class GeometryTest {
 
         for (int i = 0; i < wh.length; i++) {
             Geometry geo = new Geometry(wh[i][0], wh[i][1], Geometry.ScalingStrategy.MAXIMUM);
-            // 150x100
             Dimension dim = geo.scale(wh[i][2], wh[i][3]);
             assertEquals(wh[i][4], (int) dim.getWidth());
             assertEquals(wh[i][5], (int) dim.getHeight());
@@ -77,7 +85,6 @@ public class GeometryTest {
 
         for (int i = 0; i < wh.length; i++) {
             Geometry geo = new Geometry(wh[i][0], wh[i][1], Geometry.ScalingStrategy.MINIMUM);
-            // 150x100
             Dimension dim = geo.scale(wh[i][2], wh[i][3]);
             assertEquals(wh[i][4], (int) dim.getWidth());
             assertEquals(wh[i][5], (int) dim.getHeight());

@@ -49,7 +49,7 @@ public class Geometry {
         EMPHATIC(new Scalable() {
             public Dimension scale(int boundaryW, int boundaryH, int sourceW, int sourceH) {
                 int w = (boundaryW == NO_VALUE) ? sourceW : boundaryW;
-                int h = (boundaryH == NO_VALUE) ? (sourceH * w / sourceW) : boundaryH;
+                int h = (boundaryH == NO_VALUE) ? sourceH : boundaryH;
                 return new Dimension(w, h);
             }
         }),

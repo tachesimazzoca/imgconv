@@ -284,7 +284,7 @@ public final class ImageUtils {
                 }
             } else {
                 // convert file format
-                BufferedImage bimg = ir.read(0);
+                BufferedImage bimg = (BufferedImage) imgs[0].getRenderedImage();
                 if (formatName.equals("png") || !bimg.getColorModel().hasAlpha()) {
                     iw.write(new IIOImage(bimg, null, null));
                 } else {

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+basedir=`dirname ${0}`
+
+cp="."
+for f in $(find "${basedir}/../lib" -name *.jar)
+do
+  cp="${cp}:${f}"
+done
+
+java -cp "$cp" com.github.tachesimazzoca.imgconv.cli.ConvertCommand "$@"
