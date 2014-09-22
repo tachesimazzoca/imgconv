@@ -13,7 +13,7 @@ import com.github.tachesimazzoca.imgconv.Converter;
 import com.github.tachesimazzoca.imgconv.ConvertOption;
 import com.github.tachesimazzoca.imgconv.ImageUtils;
 
-import com.github.tachesimazzoca.imgconv.TestUtils;
+import org.apache.commons.io.FileUtils;
 
 public class AnimationConverterTest {
     private static final ConvertOption DEFAULT_CONVERT_OPTION =
@@ -29,7 +29,7 @@ public class AnimationConverterTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Converter converter = new AnimationConverter(1);
         ImageUtils.convert(input, output, DEFAULT_CONVERT_OPTION, converter);
-        assertArrayEquals(TestUtils.readFileToByteArray(
+        assertArrayEquals(FileUtils.readFileToByteArray(
                 openTestFile("/loader_1time.gif")), output.toByteArray());
     }
 
@@ -39,7 +39,7 @@ public class AnimationConverterTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Converter converter = new AnimationConverter(3);
         ImageUtils.convert(input, output, DEFAULT_CONVERT_OPTION, converter);
-        assertArrayEquals(TestUtils.readFileToByteArray(
+        assertArrayEquals(FileUtils.readFileToByteArray(
                 openTestFile("/loader_3times.gif")), output.toByteArray());
     }
 }

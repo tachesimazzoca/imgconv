@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
+
 public class ImageUtilsTest {
     private static class TestPattern {
         public final String source;
@@ -68,7 +70,7 @@ public class ImageUtilsTest {
             FileInputStream fis = new FileInputStream(openTestFile(patterns[i].source));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageUtils.convert(fis, baos, patterns[i].convertOption);
-            assertArrayEquals("patterns[" + i + "]", TestUtils.readFileToByteArray(
+            assertArrayEquals("patterns[" + i + "]", FileUtils.readFileToByteArray(
                     openTestFile(patterns[i].destination)), baos.toByteArray());
         }
     }

@@ -12,7 +12,8 @@ import java.io.IOException;
 import com.github.tachesimazzoca.imgconv.Converter;
 import com.github.tachesimazzoca.imgconv.ConvertOption;
 import com.github.tachesimazzoca.imgconv.ImageUtils;
-import com.github.tachesimazzoca.imgconv.TestUtils;
+
+import org.apache.commons.io.FileUtils;
 
 public class KetaiCopyguardConverterTest {
     private static final ConvertOption DEFAULT_CONVERT_OPTION =
@@ -33,7 +34,7 @@ public class KetaiCopyguardConverterTest {
             FileInputStream input = new FileInputStream(openTestFile(ptns[i][0]));
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             ImageUtils.convert(input, output, DEFAULT_CONVERT_OPTION, converter);
-            assertArrayEquals(TestUtils.readFileToByteArray(
+            assertArrayEquals(FileUtils.readFileToByteArray(
                     openTestFile(ptns[i][1])), output.toByteArray());
         }
     }
