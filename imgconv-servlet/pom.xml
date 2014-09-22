@@ -11,10 +11,6 @@
   <artifactId>imgconv-servlet</artifactId>
   <name>Imgconv Servlet</name>
 
-  <properties>
-    <httpcomponents.version>4.3.2</httpcomponents.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.github.tachesimazzoca</groupId>
@@ -22,10 +18,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <scope>provided</scope>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -38,9 +33,21 @@
       <version>${httpcomponents.version}</version>
     </dependency>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
