@@ -1,4 +1,4 @@
-package com.github.tachesimazzoca.imgconv.servlet;
+package com.github.tachesimazzoca.imgconv.servlet.request;
 
 import com.github.tachesimazzoca.imgconv.Geometry;
 
