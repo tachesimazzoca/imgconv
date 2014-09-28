@@ -23,7 +23,7 @@ public class ConvertRequestParser {
         String sizeParam = request.getParameter("size");
         if (sizeParam != null) {
             final Pattern sizePattern = Pattern.compile("^([0-9]+)(p)?(w|h)$");
-            final Matcher sizeMatcher = sizePattern.matcher(request.getParameter("size"));
+            final Matcher sizeMatcher = sizePattern.matcher(sizeParam);
             if (sizeMatcher.matches()) {
                 if (sizeMatcher.group(3).equals("w")) {
                     w = Integer.valueOf(sizeMatcher.group(1));
