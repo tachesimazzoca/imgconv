@@ -30,22 +30,24 @@ public class ConvertOption {
         /**
          * Represents the JPEG format.
          */
-        JPEG("jpeg"),
+        JPEG("jpeg", "jpg"),
 
         /**
          * Represents the PNG (Portable Network Graphics) format.
          */
-        PNG("png"),
+        PNG("png", "png"),
 
         /**
          * Represents the GIF (Graphics Interchange Format) format.
          */
-        GIF("gif");
+        GIF("gif", "gif");
 
         private String formatName;
+        private String[] extensions;
 
-        private Format(String formatName) {
+        private Format(String formatName, String... extensions) {
             this.formatName = formatName;
+            this.extensions = extensions;
         }
 
         /**
@@ -53,6 +55,22 @@ public class ConvertOption {
          */
         public String getFormatName() {
             return formatName;
+        }
+
+        /**
+         * Creates a new <code>Format</code> object with the extension of an
+         * image file.
+         * 
+         * @param extension extension of an image file
+         */
+        public static Format fromExtension(String extension) {
+            for (Format v : Format.values()) {
+                for (int i = 0; i < v.extensions.length; i++) {
+                    if (v.extensions[i].equals(extension))
+                        return v;
+                }
+            }
+            throw new IllegalArgumentException("unknown extension: " + extension);
         }
     }
 

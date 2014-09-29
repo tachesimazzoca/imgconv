@@ -29,4 +29,11 @@ public class ConvertOptionTest {
         assertEquals(120, (int) dim.getHeight());
         assertTrue(option.hasFlag(ConvertOption.Flag.STRIP));
     }
+
+    @Test
+    public void testFromExtensions() {
+        assertEquals(ConvertOption.Format.JPEG, ConvertOption.Format.fromExtension("jpg"));
+        assertEquals(ConvertOption.Format.PNG, ConvertOption.Format.fromExtension("png"));
+        assertEquals(ConvertOption.Format.GIF, ConvertOption.Format.fromExtension("gif"));
+    }
 }
