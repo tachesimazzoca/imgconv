@@ -4,17 +4,19 @@ import com.github.tachesimazzoca.imgconv.Geometry;
 
 public class ConvertRequest {
     private final String backendName;
-    private final String path;
-    private final String[] extensions;
+    private final String basename;
+    private final String extension;
+    private final Device device;
     private final Geometry geometry;
     private final boolean copyright;
 
     public ConvertRequest(
-            String backendName, String path, String[] extensions,
-            Geometry geometry, boolean copyright) {
+            String backendName, String basename, String extension,
+            Device device, Geometry geometry, boolean copyright) {
         this.backendName = backendName;
-        this.path = path;
-        this.extensions = extensions;
+        this.basename = basename;
+        this.extension = extension;
+        this.device = device;
         this.geometry = geometry;
         this.copyright = copyright;
     }
@@ -23,12 +25,16 @@ public class ConvertRequest {
         return backendName;
     }
 
-    public String getPath() {
-        return path;
+    public String getBasename() {
+        return basename;
     }
 
-    public String[] getExtensions() {
-        return extensions;
+    public String getExtension() {
+        return extension;
+    }
+
+    public Device getDevice() {
+        return device;
     }
 
     public Geometry getGeometry() {

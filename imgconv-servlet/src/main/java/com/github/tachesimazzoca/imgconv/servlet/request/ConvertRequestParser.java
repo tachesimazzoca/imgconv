@@ -9,14 +9,25 @@ import com.github.tachesimazzoca.imgconv.Geometry;
 
 public class ConvertRequestParser {
     public ConvertRequest parse(HttpServletRequest request) {
-        final Pattern urlPattern = Pattern.compile("^/([^/]+)(/.+)\\.(jpz|jpg|png|pnz|gif)$");
-        final Matcher urlMatcher = urlPattern.matcher(request.getPathInfo());
+        Pattern urlPattern = Pattern.compile("^/([^/]+)(/.+)\\.(jpz|jpg|png|pnz|gif)$");
+        Matcher urlMatcher = urlPattern.matcher(request.getPathInfo());
         if (!urlMatcher.matches())
             throw new IllegalArgumentException("Unsupported URL pattern");
+
+        String backendName = urlMatcher.group(1);
+        String path = urlMatcher.group(2);
+        String extension = urlMatcher.group(3);
+
         // device
         Device device = DeviceFactory.create(request);
         // copyright
-        final boolean cr = "yes".equals(request.getParameter("copyright"));
+        boolean cg;
+        if (extension.endsWith("z")) {
+            cg = true;
+            extension = extension.substring(0, extension.length() - 1) + "g";
+        } else {
+            cg = "yes".equals(request.getParameter("copyright"));
+        }
         // geometry
         int w = Geometry.NO_VALUE;
         int h = Geometry.NO_VALUE;
@@ -41,7 +52,6 @@ public class ConvertRequestParser {
             }
         }
 
-        return new ConvertRequest(urlMatcher.group(1), urlMatcher.group(2),
-                device.getExtensions(), new Geometry(w, h), cr);
+        return new ConvertRequest(backendName, path, extension, device, new Geometry(w, h), cg);
     }
 }

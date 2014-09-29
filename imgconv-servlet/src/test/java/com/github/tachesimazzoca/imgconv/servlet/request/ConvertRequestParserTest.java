@@ -29,42 +29,43 @@ public class ConvertRequestParserTest {
     }
 
     @Test
-    public void testParseValidRequest() {
+    public void testParseValidJPZRequest() {
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getPathInfo()).thenReturn("/foo/a.jpg");
-        when(req.getParameter("copyright")).thenReturn(null);
+        when(req.getPathInfo()).thenReturn("/foo/a.jpz");
         ConvertRequestParser parser = new ConvertRequestParser();
         ConvertRequest cr = parser.parse(req);
 
         assertEquals("foo", cr.getBackendName());
-        assertEquals("/a", cr.getPath());
-        assertFalse(cr.getCopyright());
+        assertEquals("/a", cr.getBasename());
+        assertEquals("jpg", cr.getExtension());
+        assertTrue(cr.getCopyright());
     }
 
     @Test
-    public void testParseValidSubdirRequest() {
+    public void testParseValidSubdirPNGRequest() {
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getPathInfo()).thenReturn("/foo/img/a.jpg");
-        when(req.getParameter("copyright")).thenReturn(null);
+        when(req.getPathInfo()).thenReturn("/foo/img/a.png");
         ConvertRequestParser parser = new ConvertRequestParser();
         ConvertRequest cr = parser.parse(req);
 
         assertEquals("foo", cr.getBackendName());
-        assertEquals("/img/a", cr.getPath());
+        assertEquals("/img/a", cr.getBasename());
+        assertEquals("png", cr.getExtension());
         assertFalse(cr.getCopyright());
     }
 
     @Test
     public void testParseSizeWidith() {
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getPathInfo()).thenReturn("/foo/img/icon.jpg");
+        when(req.getPathInfo()).thenReturn("/foo/img/icon.gif");
         when(req.getParameter("copyright")).thenReturn("yes");
         when(req.getParameter("size")).thenReturn("200w");
         ConvertRequestParser parser = new ConvertRequestParser();
         ConvertRequest cr = parser.parse(req);
 
         assertEquals("foo", cr.getBackendName());
-        assertEquals("/img/icon", cr.getPath());
+        assertEquals("/img/icon", cr.getBasename());
+        assertEquals("gif", cr.getExtension());
         assertEquals(new Geometry(200, Geometry.NO_VALUE), cr.getGeometry());
         assertTrue(cr.getCopyright());
     }
@@ -79,7 +80,8 @@ public class ConvertRequestParserTest {
         ConvertRequest cr = parser.parse(req);
 
         assertEquals("foo", cr.getBackendName());
-        assertEquals("/img/icon", cr.getPath());
+        assertEquals("/img/icon", cr.getBasename());
+        assertEquals("jpg", cr.getExtension());
         assertEquals(new Geometry(Geometry.NO_VALUE, 120), cr.getGeometry());
         assertTrue(cr.getCopyright());
     }
