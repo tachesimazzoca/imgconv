@@ -1,0 +1,14 @@
+<web-app>
+  <servlet>
+    <servlet-name>Imgconv</servlet-name>
+    <servlet-class>com.github.tachesimazzoca.imgconv.servlet.ImgconvServlet</servlet-class>
+    <init-param>
+      <param-name>conf.backend</param-name>
+      <param-value>/path/to/conf/dir</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Imgconv</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+</web-app>
