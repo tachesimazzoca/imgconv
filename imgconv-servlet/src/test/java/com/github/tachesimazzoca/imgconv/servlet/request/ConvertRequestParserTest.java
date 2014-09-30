@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.github.tachesimazzoca.imgconv.ConvertOption.Format;
 import com.github.tachesimazzoca.imgconv.Geometry;
 
 public class ConvertRequestParserTest {
@@ -36,9 +37,9 @@ public class ConvertRequestParserTest {
         ConvertRequest cr = parser.parse(req);
 
         assertEquals("foo", cr.getBackendName());
-        assertEquals("/a", cr.getBasename());
-        assertEquals("jpg", cr.getExtension());
-        assertTrue(cr.getCopyright());
+        assertEquals("/a.jpg", cr.getPath());
+        assertEquals(Format.JPEG, cr.getConvertOption().getFormat());
+        assertTrue(cr.isNoTransfer());
     }
 
     @Test
@@ -49,9 +50,9 @@ public class ConvertRequestParserTest {
         ConvertRequest cr = parser.parse(req);
 
         assertEquals("foo", cr.getBackendName());
-        assertEquals("/img/a", cr.getBasename());
-        assertEquals("png", cr.getExtension());
-        assertFalse(cr.getCopyright());
+        assertEquals("/img/a.png", cr.getPath());
+        assertEquals(Format.PNG, cr.getConvertOption().getFormat());
+        assertFalse(cr.isNoTransfer());
     }
 
     @Test
@@ -64,10 +65,11 @@ public class ConvertRequestParserTest {
         ConvertRequest cr = parser.parse(req);
 
         assertEquals("foo", cr.getBackendName());
-        assertEquals("/img/icon", cr.getBasename());
-        assertEquals("gif", cr.getExtension());
-        assertEquals(new Geometry(200, Geometry.NO_VALUE), cr.getGeometry());
-        assertTrue(cr.getCopyright());
+        assertEquals("/img/icon.gif", cr.getPath());
+        assertEquals(Format.GIF, cr.getConvertOption().getFormat());
+        assertEquals(new Geometry(200, Geometry.NO_VALUE),
+                cr.getConvertOption().getGeometry());
+        assertTrue(cr.isNoTransfer());
     }
 
     @Test
@@ -80,9 +82,10 @@ public class ConvertRequestParserTest {
         ConvertRequest cr = parser.parse(req);
 
         assertEquals("foo", cr.getBackendName());
-        assertEquals("/img/icon", cr.getBasename());
-        assertEquals("jpg", cr.getExtension());
-        assertEquals(new Geometry(Geometry.NO_VALUE, 120), cr.getGeometry());
-        assertTrue(cr.getCopyright());
+        assertEquals("/img/icon.jpg", cr.getPath());
+        assertEquals(Format.JPEG, cr.getConvertOption().getFormat());
+        assertEquals(new Geometry(Geometry.NO_VALUE, 120),
+                cr.getConvertOption().getGeometry());
+        assertTrue(cr.isNoTransfer());
     }
 }

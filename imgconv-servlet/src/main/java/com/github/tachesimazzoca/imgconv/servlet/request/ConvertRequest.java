@@ -1,47 +1,40 @@
 package com.github.tachesimazzoca.imgconv.servlet.request;
 
-import com.github.tachesimazzoca.imgconv.Geometry;
+import com.github.tachesimazzoca.imgconv.ConvertOption;
 
 public class ConvertRequest {
     private final String backendName;
-    private final String basename;
-    private final String extension;
+    private final String path;
     private final Device device;
-    private final Geometry geometry;
-    private final boolean copyright;
+    private final ConvertOption convertOption;
+    private final boolean noTransfer;
 
-    public ConvertRequest(
-            String backendName, String basename, String extension,
-            Device device, Geometry geometry, boolean copyright) {
+    public ConvertRequest(String backendName, String path, Device device,
+            ConvertOption convertOption, boolean noTransfer) {
         this.backendName = backendName;
-        this.basename = basename;
-        this.extension = extension;
+        this.path = path;
         this.device = device;
-        this.geometry = geometry;
-        this.copyright = copyright;
+        this.convertOption = convertOption;
+        this.noTransfer = noTransfer;
     }
 
     public String getBackendName() {
         return backendName;
     }
 
-    public String getBasename() {
-        return basename;
-    }
-
-    public String getExtension() {
-        return extension;
+    public String getPath() {
+        return path;
     }
 
     public Device getDevice() {
         return device;
     }
 
-    public Geometry getGeometry() {
-        return geometry;
+    public ConvertOption getConvertOption() {
+        return convertOption;
     }
 
-    public boolean getCopyright() {
-        return copyright;
+    public boolean isNoTransfer() {
+        return noTransfer;
     }
 }

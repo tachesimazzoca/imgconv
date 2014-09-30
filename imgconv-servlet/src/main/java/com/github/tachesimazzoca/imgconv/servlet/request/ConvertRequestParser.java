@@ -2,10 +2,14 @@ package com.github.tachesimazzoca.imgconv.servlet.request;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.tachesimazzoca.imgconv.Geometry;
+import com.github.tachesimazzoca.imgconv.ConvertOption;
+import com.github.tachesimazzoca.imgconv.ConvertOption.Format;
 
 public class ConvertRequestParser {
     public ConvertRequest parse(HttpServletRequest request) {
@@ -15,7 +19,7 @@ public class ConvertRequestParser {
             throw new IllegalArgumentException("Unsupported URL pattern");
 
         String backendName = urlMatcher.group(1);
-        String path = urlMatcher.group(2);
+        String basename = urlMatcher.group(2);
         String extension = urlMatcher.group(3);
 
         // device
@@ -28,6 +32,7 @@ public class ConvertRequestParser {
         } else {
             cg = "yes".equals(request.getParameter("copyright"));
         }
+
         // geometry
         int w = Geometry.NO_VALUE;
         int h = Geometry.NO_VALUE;
@@ -52,6 +57,19 @@ public class ConvertRequestParser {
             }
         }
 
-        return new ConvertRequest(backendName, path, extension, device, new Geometry(w, h), cg);
+        // format
+        Format ft = Format.fromExtension(extension);
+        List<Format> formats = Arrays.asList(device.getAcceptFormats());
+        Format outputFormat;
+        if (!formats.isEmpty() && !formats.contains(ft))
+            outputFormat = formats.get(0);
+        else
+            outputFormat = ft;
+        ConvertOption cvOpt = ConvertOption.builder()
+                .format(outputFormat)
+                .geometry(new Geometry(w, h, Geometry.ScalingStrategy.MAXIMUM))
+                .build();
+
+        return new ConvertRequest(backendName, basename + "." + extension, device, cvOpt, cg);
     }
 }

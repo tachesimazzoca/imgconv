@@ -1,20 +1,22 @@
 package com.github.tachesimazzoca.imgconv.servlet.request;
 
+import com.github.tachesimazzoca.imgconv.ConvertOption.Format;
+
 public class Device {
     private final Group group;
     private final int displayWidth;
     private final int displayHeight;
-    private final String[] extensions;
+    private final Format[] acceptFormats;
 
     public enum Group {
         OTHER, DOCOMO, AU, SOFTBANK, WILLCOM
     }
 
-    public Device(Group group, int displayWidth, int displayHeight, String[] extensions) {
+    public Device(Group group, int displayWidth, int displayHeight, Format[] acceptFormats) {
         this.group = group;
         this.displayWidth = displayWidth;
         this.displayHeight = displayHeight;
-        this.extensions = extensions;
+        this.acceptFormats = acceptFormats;
     }
 
     public Group getGroup() {
@@ -29,7 +31,7 @@ public class Device {
         return displayHeight;
     }
 
-    public String[] getExtensions() {
-        return extensions;
+    public Format[] getAcceptFormats() {
+        return acceptFormats;
     }
 }

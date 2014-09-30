@@ -29,10 +29,11 @@ import com.github.tachesimazzoca.imgconv.servlet.request.Device;
 public class ImgconvServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, String> CONTENT_TYPE_MAP = ImmutableMap.of(
-            "jpg", "image/jpeg",
-            "png", "image/png",
-            "gif", "image/gif");
+    private static final Map<ConvertOption.Format, String> CONTENT_TYPE_MAP =
+            ImmutableMap.of(
+                    ConvertOption.Format.JPEG, "image/jpeg",
+                    ConvertOption.Format.GIF, "image/gif",
+                    ConvertOption.Format.PNG, "image/png");
 
     private Map<String, Fetcher> fetcherMap;
 
@@ -69,21 +70,7 @@ public class ImgconvServlet extends HttpServlet {
             return;
         }
 
-        String ext = cr.getExtension();
-        Optional<InputStream> img = fetcher.fetch(cr.getBasename() + "." + ext);
-        if (!img.isPresent()) {
-            String[] exts = { "jpg", "gif", "png" };
-            for (int i = 0; i < exts.length; i++) {
-                ext = null;
-                if (cr.getExtension().equals(exts[i]))
-                    continue;
-                img = fetcher.fetch(cr.getBasename() + "." + exts[i]);
-                if (img.isPresent()) {
-                    ext = exts[i];
-                    break;
-                }
-            }
-        }
+        Optional<InputStream> img = fetcher.fetch(cr.getPath());
         if (!img.isPresent()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -91,21 +78,25 @@ public class ImgconvServlet extends HttpServlet {
 
         // device
         Device device = cr.getDevice();
-        // detect output format
-        ConvertOption.Format format = detectFormat(ext, device.getExtensions());
-        // convertOption
-        ConvertOption.Builder builder = ConvertOption.builder();
-        if (format != null)
-            builder.format(format);
-        builder.geometry(cr.getGeometry());
-        ConvertOption cvOpt = builder.build();
+
+        // contentType
+        ConvertOption cvOpt = cr.getConvertOption();
+        String contentType;
+        if (cvOpt.hasFormat()) {
+            contentType = CONTENT_TYPE_MAP.get(cvOpt.getFormat());
+        } else {
+            contentType = null;
+        }
 
         // output
         OutputStream out = response.getOutputStream();
         try {
-            if (CONTENT_TYPE_MAP.containsKey(ext))
-                response.setContentType(CONTENT_TYPE_MAP.get(ext));
-            if (cr.getCopyright()) {
+            if (contentType != null)
+                response.setContentType(contentType);
+            else
+                response.setContentType("application/octet-stream");
+
+            if (cr.isNoTransfer()) {
                 if (device.getGroup() == Device.Group.SOFTBANK) {
                     response.addHeader("x-jphone-copyright", "no-transfer");
                     response.addHeader("x-jphone-copyright", "no-peripheral");
@@ -117,25 +108,5 @@ public class ImgconvServlet extends HttpServlet {
         } finally {
             IOUtils.closeQuietly(out);
         }
-    }
-
-    private static ConvertOption.Format detectFormat(String extension, String[] supported) {
-        String outExt = null;
-        if (supported.length == 0) {
-            outExt = extension;
-        } else {
-            for (int i = 0; i < supported.length; i++) {
-                if (supported[i].equals(extension)) {
-                    outExt = extension;
-                    break;
-                }
-            }
-            if (outExt == null)
-                outExt = supported[0];
-        }
-        if (!outExt.equals(extension))
-            return ConvertOption.Format.fromExtension(outExt);
-        else
-            return null;
     }
 }

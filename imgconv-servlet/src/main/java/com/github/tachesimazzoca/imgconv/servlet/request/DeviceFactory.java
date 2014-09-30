@@ -7,6 +7,7 @@ import com.google.common.base.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.github.tachesimazzoca.imgconv.ConvertOption.Format;
 import com.github.tachesimazzoca.imgconv.Geometry;
 
 public class DeviceFactory {
@@ -24,7 +25,7 @@ public class DeviceFactory {
                 return deviceOpt.get();
         }
         return new Device(Device.Group.OTHER,
-                Geometry.NO_VALUE, Geometry.NO_VALUE, new String[0]);
+                Geometry.NO_VALUE, Geometry.NO_VALUE, new Format[0]);
     }
 
     private interface Detector {
@@ -34,13 +35,13 @@ public class DeviceFactory {
     private static abstract class AbstractDetector implements Detector {
         private final Device.Group group;
         private final String userAgentPattern;
-        private final String[] extensions;
+        private final Format[] formats;
 
         private AbstractDetector(Device.Group group,
-                String userAgentPattern, String[] extensions) {
+                String userAgentPattern, Format... formats) {
             this.group = group;
             this.userAgentPattern = userAgentPattern;
-            this.extensions = extensions;
+            this.formats = formats;
         }
 
         @Override
@@ -53,21 +54,21 @@ public class DeviceFactory {
             if (!m.matches())
                 return Optional.absent();
             // Use the QVGA display as default.
-            return Optional.of(new Device(group, 240, 320, extensions));
+            return Optional.of(new Device(group, 240, 320, formats));
         }
     }
 
     private static class DocomoDetector extends AbstractDetector {
         public DocomoDetector() {
             super(Device.Group.DOCOMO, "^DoCoMo/\\d\\.\\d[ /].+$",
-                    new String[] { "jpg", "gif" });
+                    Format.JPEG, Format.GIF);
         }
     }
 
     private static class AuDetector extends AbstractDetector {
         public AuDetector() {
             super(Device.Group.AU, "^(?:KDDI-[A-Z]+\\d+[A-Z]? )?UP\\.Browser/.+$",
-                    new String[] { "jpg", "gif", "png" });
+                    Format.JPEG, Format.GIF, Format.PNG);
         }
     }
 
@@ -92,15 +93,15 @@ public class DeviceFactory {
                     h = Integer.valueOf(displayMatcher.group(2));
                 }
             }
-            String exts[] = { "jpg", "png" };
-            return Optional.of(new Device(Device.Group.SOFTBANK, w, h, exts));
+            return Optional.of(new Device(Device.Group.SOFTBANK, w, h,
+                    new Format[] { Format.JPEG, Format.PNG }));
         }
     }
 
     private static class WillcomDetector extends AbstractDetector {
         public WillcomDetector() {
             super(Device.Group.WILLCOM, "^Mozilla/3\\.0\\((?:DDIPOCKET|WILLCOM);.+$",
-                    new String[] { "jpg", "gif", "png" });
+                    Format.JPEG, Format.GIF, Format.PNG);
         }
     }
 }

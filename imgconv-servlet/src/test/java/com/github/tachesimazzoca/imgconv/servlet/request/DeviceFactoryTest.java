@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.github.tachesimazzoca.imgconv.ConvertOption.Format;
 import com.github.tachesimazzoca.imgconv.Geometry;
 
 public class DeviceFactoryTest {
@@ -19,7 +20,7 @@ public class DeviceFactoryTest {
         assertEquals(Device.Group.OTHER, device.getGroup());
         assertEquals(Geometry.NO_VALUE, device.getDisplayWidth());
         assertEquals(Geometry.NO_VALUE, device.getDisplayHeight());
-        assertEquals(0, device.getExtensions().length);
+        assertEquals(0, device.getAcceptFormats().length);
     }
 
     @Test
@@ -30,7 +31,7 @@ public class DeviceFactoryTest {
         assertEquals(Device.Group.OTHER, device.getGroup());
         assertEquals(Geometry.NO_VALUE, device.getDisplayWidth());
         assertEquals(Geometry.NO_VALUE, device.getDisplayHeight());
-        assertEquals(0, device.getExtensions().length);
+        assertEquals(0, device.getAcceptFormats().length);
     }
 
     @Test
@@ -42,7 +43,8 @@ public class DeviceFactoryTest {
         assertEquals(Device.Group.DOCOMO, device.getGroup());
         assertEquals(240, device.getDisplayWidth());
         assertEquals(320, device.getDisplayHeight());
-        assertArrayEquals(new String[] { "jpg", "gif" }, device.getExtensions());
+        assertArrayEquals(new Format[] { Format.JPEG, Format.GIF },
+                device.getAcceptFormats());
     }
 
     @Test
@@ -54,7 +56,8 @@ public class DeviceFactoryTest {
         assertEquals(Device.Group.AU, device.getGroup());
         assertEquals(240, device.getDisplayWidth());
         assertEquals(320, device.getDisplayHeight());
-        assertArrayEquals(new String[] { "jpg", "gif", "png" }, device.getExtensions());
+        assertArrayEquals(new Format[] { Format.JPEG, Format.GIF, Format.PNG },
+                device.getAcceptFormats());
     }
 
     @Test
@@ -68,7 +71,8 @@ public class DeviceFactoryTest {
         assertEquals(Device.Group.SOFTBANK, device.getGroup());
         assertEquals(480, device.getDisplayWidth());
         assertEquals(640, device.getDisplayHeight());
-        assertArrayEquals(new String[] { "jpg", "png" }, device.getExtensions());
+        assertArrayEquals(new Format[] { Format.JPEG, Format.PNG },
+                device.getAcceptFormats());
     }
 
     @Test
@@ -80,6 +84,7 @@ public class DeviceFactoryTest {
         assertEquals(Device.Group.WILLCOM, device.getGroup());
         assertEquals(240, device.getDisplayWidth());
         assertEquals(320, device.getDisplayHeight());
-        assertArrayEquals(new String[] { "jpg", "gif", "png" }, device.getExtensions());
+        assertArrayEquals(new Format[] { Format.JPEG, Format.GIF, Format.PNG },
+                device.getAcceptFormats());
     }
 }
