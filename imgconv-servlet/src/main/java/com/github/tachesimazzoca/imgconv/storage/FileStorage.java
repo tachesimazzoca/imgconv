@@ -23,15 +23,23 @@ public class FileStorage implements Storage {
         this.baseDirectory = baseDirectory;
     }
 
-    public Optional<InputStream> read(String key) throws IOException {
+    public Optional<InputStream> read(String key, long lastModified) throws IOException {
         if (!baseDirectory.exists())
             return Optional.absent();
 
         File f = new File(this.baseDirectory, key);
         if (!f.exists() || !f.isFile())
             return Optional.absent();
+        if (f.lastModified() < lastModified) {
+            delete(key);
+            return Optional.absent();
+        }
 
         return Optional.of((InputStream) new FileInputStream(f));
+    }
+
+    public Optional<InputStream> read(String key) throws IOException {
+        return read(key, -1);
     }
 
     public void write(String key, InputStream input) throws IOException {

@@ -11,9 +11,22 @@ import static org.apache.commons.io.IOUtils.closeQuietly;
 
 public class MockStorage implements Storage {
     private byte[] bytes;
+    private long timestamp;
 
     public MockStorage(byte[] bytes) {
+        this(bytes, System.currentTimeMillis());
+    }
+
+    public MockStorage(byte[] bytes, long timestamp) {
         this.bytes = bytes;
+        this.timestamp = timestamp;
+    }
+
+    public Optional<InputStream> read(String key, long lastModified) {
+        if (lastModified > timestamp)
+            return Optional.absent();
+        else
+            return read(key);
     }
 
     public Optional<InputStream> read(String key) {
@@ -29,6 +42,7 @@ public class MockStorage implements Storage {
         try {
             copyLarge(input, baos);
             bytes = baos.toByteArray();
+            timestamp = System.currentTimeMillis();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {

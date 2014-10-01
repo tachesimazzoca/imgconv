@@ -39,9 +39,13 @@ public class HttpFetcherTest {
     }
 
     private HttpFetcher createMockFetcher(byte[] bytes) {
+        return createMockFetcher(bytes, System.currentTimeMillis());
+    }
+
+    private HttpFetcher createMockFetcher(byte[] bytes, long timestamp) {
         return new HttpFetcher(
                 "http://localhost:" + MOCK_SERVER_PORT,
-                new MockStorage(bytes));
+                new MockStorage(bytes, timestamp));
     }
 
     @Test
@@ -66,7 +70,28 @@ public class HttpFetcherTest {
         byte[] bytes = FileUtils.readFileToByteArray(getTestFile("/cmyk.gif"));
         HttpFetcher fetcher = createMockFetcher(bytes);
 
-        HttpServer server = createHttpServer(500, new byte[0]);
+        HttpServer server = createHttpServer(200, new byte[0],
+                "Last-Modified: Tue, 30 Sep 2014 01:23:45 GMT");
+        try {
+            server.start();
+            String path = "/cmyk.gif";
+            Optional<InputStream> opt = fetcher.fetch(path);
+            assertTrue(opt.isPresent());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            copyLarge(opt.get(), baos);
+            assertArrayEquals(bytes, baos.toByteArray());
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testCacheMiss() throws IOException {
+        byte[] bytes = FileUtils.readFileToByteArray(getTestFile("/cmyk.gif"));
+        HttpFetcher fetcher = createMockFetcher(bytes, 0L);
+
+        HttpServer server = createHttpServer(200, bytes,
+                "Last-Modified: Tue, 30 Sep 2014 01:23:45 GMT");
         try {
             server.start();
             String path = "/cmyk.gif";
@@ -135,11 +160,14 @@ public class HttpFetcherTest {
         }
         server.createContext("/", new HttpHandler() {
             public void handle(HttpExchange t) throws IOException {
-                t.sendResponseHeaders(status, bytes.length);
                 Headers res = t.getResponseHeaders();
                 for (int i = 0; i < kvs.length; i++) {
-                    res.set(kvs[i][0], kvs[i][1]);
+                    res.add(kvs[i][0], kvs[i][1]);
                 }
+                if (t.getRequestMethod().equals("HEAD"))
+                    t.sendResponseHeaders(status, -1);
+                else
+                    t.sendResponseHeaders(status, bytes.length);
                 OutputStream os = t.getResponseBody();
                 os.write(bytes);
                 os.close();
