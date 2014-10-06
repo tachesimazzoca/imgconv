@@ -13,7 +13,21 @@ import com.google.common.collect.ImmutableMap;
 
 import com.github.tachesimazzoca.imgconv.storage.FileStorage;
 
+/**
+ * A client uses the FetcherFactory class to create any {@link Fetcher} objects.
+ */
 public class FetcherFactory {
+    private FetcherFactory() {
+    }
+
+    /**
+     * Creates a map of the {@link Fetcher} objects built from the configuration
+     * <code>*.properties</code> files in the specified directory.
+     * 
+     * @param confPath The directory path to the configuration files
+     * @return A map of key-value pairs of the {@link Fetcher} objects
+     * @throws IOException
+     */
     public static Map<String, Fetcher> createFetcherMap(File confPath)
             throws IOException {
         final String[] extensions = { "properties" };

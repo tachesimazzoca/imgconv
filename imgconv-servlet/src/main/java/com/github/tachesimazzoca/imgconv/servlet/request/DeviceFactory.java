@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import com.github.tachesimazzoca.imgconv.ConvertOption.Format;
 import com.github.tachesimazzoca.imgconv.Geometry;
 
+/**
+ * A client uses the {@code DeviceFactory} to create a {@link Device} object.
+ */
 public class DeviceFactory {
     private static final Detector[] detectors = new Detector[] {
             new DocomoDetector(),
@@ -18,6 +21,14 @@ public class DeviceFactory {
             new WillcomDetector()
     };
 
+    /**
+     * Create a new {@link Device} object from the {@code HttpServletRequest}
+     * object.
+     * 
+     * @param request The {@code HttpServletRequest} object
+     * @return A {@link Device} object created from the
+     *         {@code HttpServletRequest} object
+     */
     public static Device create(HttpServletRequest request) {
         for (int i = 0; i < detectors.length; i++) {
             Optional<Device> deviceOpt = detectors[i].detect(request);

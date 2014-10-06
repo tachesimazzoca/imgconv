@@ -11,7 +11,17 @@ import com.github.tachesimazzoca.imgconv.Geometry;
 import com.github.tachesimazzoca.imgconv.ConvertOption;
 import com.github.tachesimazzoca.imgconv.ConvertOption.Format;
 
+/**
+ * A {@code ConvertRequestParser} object is used to parse into a
+ * {@link ConvertRequest} object.
+ */
 public class ConvertRequestParser {
+    /**
+     * Parse a {@code HttpServletRequest} object.
+     * 
+     * @param request A {@code HttpServletRequest} object
+     * @return A {@code ConvertRequest} object to parse
+     */
     public ConvertRequest parse(HttpServletRequest request) {
         Pattern urlPattern = Pattern.compile("^/([^/]+)(/.+)\\.(jpz|jpg|png|pnz|gif)$");
         Matcher urlMatcher = urlPattern.matcher(request.getPathInfo());

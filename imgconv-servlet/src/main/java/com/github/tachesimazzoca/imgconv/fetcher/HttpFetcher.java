@@ -18,15 +18,26 @@ import com.google.common.base.Optional;
 
 import com.github.tachesimazzoca.imgconv.storage.Storage;
 
+/**
+ * A fetcher for HTTP resources
+ */
 public class HttpFetcher implements Fetcher {
     private final String baseurl;
     private final Storage storage;
 
+    /**
+     * Creates a new {@code HttpFetcher} object with the base URL and the
+     * {@link Storage} object.
+     * 
+     * @param baseurl The base URL, e.g. {@code http://foo.example.net/img}
+     * @param storage The {@link Storage} object to save resources as cache
+     */
     public HttpFetcher(String baseurl, Storage storage) {
         this.baseurl = baseurl;
         this.storage = storage;
     }
 
+    @Override
     public Optional<InputStream> fetch(final String path)
             throws IOException {
         Optional<Long> ts = withHttpResponse(
