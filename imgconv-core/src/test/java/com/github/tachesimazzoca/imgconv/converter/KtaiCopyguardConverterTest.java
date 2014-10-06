@@ -15,7 +15,7 @@ import com.github.tachesimazzoca.imgconv.ImageUtils;
 
 import org.apache.commons.io.FileUtils;
 
-public class KetaiCopyguardConverterTest {
+public class KtaiCopyguardConverterTest {
     private static final ConvertOption DEFAULT_CONVERT_OPTION =
             ConvertOption.builder().build();
 
@@ -25,7 +25,7 @@ public class KetaiCopyguardConverterTest {
 
     @Test
     public void testConvertJPEG() throws IOException {
-        Converter converter = new KetaiCopyguardConverter();
+        Converter converter = new KtaiCopyguardConverter();
         String[][] ptns = {
                 { "peacock.jpg", "peacock_copyguard.jpg" },
                 { "desktop.png", "desktop_copyguard.png" },

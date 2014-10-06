@@ -19,7 +19,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.github.tachesimazzoca.imgconv.ConvertOption;
 import com.github.tachesimazzoca.imgconv.ImageUtils;
-import com.github.tachesimazzoca.imgconv.converter.KetaiCopyguardConverter;
+import com.github.tachesimazzoca.imgconv.converter.KtaiCopyguardConverter;
 import com.github.tachesimazzoca.imgconv.fetcher.Fetcher;
 import com.github.tachesimazzoca.imgconv.fetcher.FetcherFactory;
 import com.github.tachesimazzoca.imgconv.servlet.request.ConvertRequest;
@@ -101,7 +101,7 @@ public class ImgconvServlet extends HttpServlet {
                     response.addHeader("x-jphone-copyright", "no-transfer");
                     response.addHeader("x-jphone-copyright", "no-peripheral");
                 }
-                ImageUtils.convert(img.get(), out, cvOpt, new KetaiCopyguardConverter());
+                ImageUtils.convert(img.get(), out, cvOpt, new KtaiCopyguardConverter());
             } else {
                 ImageUtils.convert(img.get(), out, cvOpt);
             }

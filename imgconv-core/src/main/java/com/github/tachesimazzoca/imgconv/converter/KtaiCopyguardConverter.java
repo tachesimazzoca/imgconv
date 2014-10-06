@@ -22,12 +22,12 @@ import com.github.tachesimazzoca.imgconv.metadata.GIFMetadataNodeHelper;
  * @see com.github.tachesimazzoca.imgconv.metadata.PNGMetadataNodeHelper
  * @see com.github.tachesimazzoca.imgconv.metadata.GIFMetadataNodeHelper
  */
-public class KetaiCopyguardConverter implements Converter {
+public class KtaiCopyguardConverter implements Converter {
     private final static String COPYGUARD_COMMENT = "kddi_copyright=on,copy=\"NO\"";
 
     private final Map<String, MetadataNodeHelper> helpers;
 
-    public KetaiCopyguardConverter() {
+    public KtaiCopyguardConverter() {
         helpers = new HashMap<String, MetadataNodeHelper>();
         helpers.put("javax_imageio_jpeg_image_1.0", new JPEGMetadataNodeHelper());
         helpers.put("javax_imageio_png_1.0", new PNGMetadataNodeHelper("Copyright"));
