@@ -1,38 +1,42 @@
 package com.github.tachesimazzoca.imgconv.fetcher;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.File;
-import java.io.OutputStream;
-
-import java.net.InetSocketAddress;
-
-import com.github.tachesimazzoca.imgconv.fetcher.HttpFetcher;
+import com.github.tachesimazzoca.imgconv.storage.FileStorage;
+import com.github.tachesimazzoca.imgconv.storage.MockStorage;
+import com.google.common.base.Optional;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import com.google.common.base.Optional;
+import java.io.*;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 
 import static org.apache.commons.io.IOUtils.copyLarge;
-import org.apache.commons.io.FileUtils;
-
-import com.github.tachesimazzoca.imgconv.storage.FileStorage;
-import com.github.tachesimazzoca.imgconv.storage.MockStorage;
+import static org.junit.Assert.*;
 
 public class HttpFetcherTest {
-    private static int MOCK_SERVER_PORT = 8880;
+    private static int MOCK_SERVER_PORT = 9000;
 
     @Rule
     public TemporaryFolder tmpdir = new TemporaryFolder();
+
+    @BeforeClass
+    public static void assignMockServerPort() {
+        for (int n = 9000; n < 9100; n++) {
+            if (isAvailablePort(n)) {
+                MOCK_SERVER_PORT = n;
+                return;
+            }
+        }
+    }
 
     private File getTestFile(String path) {
         return new File(getClass().getResource("/test").getPath(), path);
@@ -54,13 +58,16 @@ public class HttpFetcherTest {
         int[] statusCodes = { 302, 401, 403, 404, 503, 505 };
 
         for (int i = 0; i < statusCodes.length; i++) {
-            HttpServer server = createHttpServer(statusCodes[i], new byte[0]);
+            HttpServer server = null;
             try {
+                server = createHttpServer(statusCodes[i], new byte[0]);
                 server.start();
                 String path = "/deadbeef.jpg";
                 assertEquals(Optional.<InputStream> absent(), fetcher.fetch(path));
             } finally {
-                server.stop(0);
+                if (server != null) {
+                    server.stop(1);
+                }
             }
         }
     }
@@ -70,9 +77,10 @@ public class HttpFetcherTest {
         byte[] bytes = FileUtils.readFileToByteArray(getTestFile("/cmyk.gif"));
         HttpFetcher fetcher = createMockFetcher(bytes);
 
-        HttpServer server = createHttpServer(200, new byte[0],
-                "Last-Modified: Tue, 30 Sep 2014 01:23:45 GMT");
+        HttpServer server = null;
         try {
+            server = createHttpServer(200, new byte[0],
+                    "Last-Modified: Tue, 30 Sep 2014 01:23:45 GMT");
             server.start();
             String path = "/cmyk.gif";
             Optional<InputStream> opt = fetcher.fetch(path);
@@ -81,7 +89,9 @@ public class HttpFetcherTest {
             copyLarge(opt.get(), baos);
             assertArrayEquals(bytes, baos.toByteArray());
         } finally {
-            server.stop(0);
+            if (server != null) {
+                server.stop(0);
+            }
         }
     }
 
@@ -90,9 +100,10 @@ public class HttpFetcherTest {
         byte[] bytes = FileUtils.readFileToByteArray(getTestFile("/cmyk.gif"));
         HttpFetcher fetcher = createMockFetcher(bytes, 0L);
 
-        HttpServer server = createHttpServer(200, bytes,
-                "Last-Modified: Tue, 30 Sep 2014 01:23:45 GMT");
+        HttpServer server = null;
         try {
+            server = createHttpServer(200, bytes,
+                    "Last-Modified: Tue, 30 Sep 2014 01:23:45 GMT");
             server.start();
             String path = "/cmyk.gif";
             Optional<InputStream> opt = fetcher.fetch(path);
@@ -101,7 +112,9 @@ public class HttpFetcherTest {
             copyLarge(opt.get(), baos);
             assertArrayEquals(bytes, baos.toByteArray());
         } finally {
-            server.stop(0);
+            if (server != null) {
+                server.stop(0);
+            }
         }
     }
 
@@ -110,8 +123,9 @@ public class HttpFetcherTest {
         byte[] bytes = FileUtils.readFileToByteArray(getTestFile("/cmyk.gif"));
         HttpFetcher fetcher = createMockFetcher(null);
 
-        HttpServer server = createHttpServer(200, bytes);
+        HttpServer server = null;
         try {
+            server = createHttpServer(200, bytes);
             server.start();
             String path = "/cmyk.gif";
             Optional<InputStream> opt = fetcher.fetch(path);
@@ -120,7 +134,9 @@ public class HttpFetcherTest {
             copyLarge(opt.get(), baos);
             assertArrayEquals(bytes, baos.toByteArray());
         } finally {
-            server.stop(0);
+            if (server != null) {
+                server.stop(0);
+            }
         }
     }
 
@@ -131,8 +147,9 @@ public class HttpFetcherTest {
                 new FileStorage(tmpdir.newFolder()));
 
         byte[] bytes = FileUtils.readFileToByteArray(getTestFile("/cmyk.gif"));
-        HttpServer server = createHttpServer(200, bytes);
+        HttpServer server = null;
         try {
+            server = createHttpServer(200, bytes);
             server.start();
             String path = "/cmyk.gif";
             Optional<InputStream> opt = fetcher.fetch(path);
@@ -141,7 +158,9 @@ public class HttpFetcherTest {
             copyLarge(opt.get(), baos);
             assertArrayEquals(bytes, baos.toByteArray());
         } finally {
-            server.stop(0);
+            if (server != null) {
+                server.stop(0);
+            }
         }
     }
 
@@ -149,7 +168,6 @@ public class HttpFetcherTest {
             final int status,
             final byte[] bytes,
             final String... headers) throws IOException {
-
         HttpServer server = HttpServer.create(
                 new InetSocketAddress("localhost", MOCK_SERVER_PORT), 5);
         final String[][] kvs = new String[headers.length][2];
@@ -174,5 +192,22 @@ public class HttpFetcherTest {
             }
         });
         return server;
+    }
+
+    public static boolean isAvailablePort(int port) {
+        ServerSocket ss = null;
+        DatagramSocket ds = null;
+        try {
+            ss = new ServerSocket(port);
+            ss.setReuseAddress(true);
+            ds = new DatagramSocket(port);
+            ds.setReuseAddress(true);
+            return true;
+        } catch (IOException e) {
+        } finally {
+            IOUtils.closeQuietly(ds);
+            IOUtils.closeQuietly(ss);
+        }
+        return false;
     }
 }

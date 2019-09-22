@@ -46,6 +46,13 @@ public class MetadataDumperTest {
     public void testInspectJPEG() throws IOException {
         String expected = FileUtils.readFileToString(openTestFile("/peacock.jpg.dump"));
         String actual = inspect(new FileInputStream(openTestFile("/peacock.jpg")));
-        assertEquals(expected, actual);
+        assertEquals(expected, normalizeNewline(actual));
+    }
+
+    private static String normalizeNewline(String str) {
+        if (str == null) {
+            return null;
+        }
+        return str.replace("\r\n", "\n").replace("\r", "\n");
     }
 }
